@@ -1,0 +1,136 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ court.name }} - ArenaPadel.club{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Court Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'web:web_home' %}">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'web:web_court_list' %}">Canchas</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ court.name }}</li>
+                </ol>
+            </nav>
+            
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="fw-bold mb-2">{{ court.name }}</h1>
+                    <p class="lead mb-0">Cancha #{{ court.number }} - ${{ court.hourly_rate }}/hora</p>
+                </div>
+                {% if selected_date and selected_hour and is_available %}
+                <div>
+                    <form method="post" action="{% url 'web:web_create_reservation' court.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+                        <input type="hidden" name="time" value="{{ selected_hour }}">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-calendar-check me-2"></i>Confirmar Reserva
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Court Calendar -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="h4 mb-4">Calendario de Disponibilidad</h2>
+                    
+                    <!-- Date Navigation -->
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    {% for date in next_week_dates %}
+                                    <th scope="col" {% if date == selected_date %}class="table-primary"{% endif %}>
+                                        {{ date|date:"D" }}<br>
+                                        {{ date|date:"d M" }}
+                                    </th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    {% for date in next_week_dates %}
+                                    <td>
+                                        <div class="btn-group-vertical w-100">
+                                            {% for hour in available_hours %}
+                                            <a href="{% url 'web:web_court_detail' court.id %}?date={{ date|date:'Y-m-d' }}&time={{ hour }}"
+                                               class="btn btn-sm {% if not availability|default:False %}btn-outline-danger disabled{% else %}btn-outline-success{% endif %} mb-1
+                                                      {% if date == selected_date and hour == selected_hour %}active{% endif %}">
+                                                {{ hour }}:00
+                                            </a>
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {% if selected_date and selected_hour %}
+                    <div class="alert {% if is_available %}alert-success{% else %}alert-danger{% endif %}">
+                        <h3 class="h5 mb-2">
+                            {% if is_available %}
+                            <i class="bi bi-check-circle me-2"></i>Horario Disponible
+                            {% else %}
+                            <i class="bi bi-x-circle me-2"></i>Horario No Disponible
+                            {% endif %}
+                        </h3>
+                        <p class="mb-0">
+                            {{ selected_datetime|date:"l d/m/Y" }} de 
+                            {{ selected_datetime|date:"H:i" }} a 
+                            {{ end_datetime|date:"H:i" }}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Court Info -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-4">Información de la Cancha</h2>
+                    
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="bi bi-hash me-2"></i>
+                            <strong>Número:</strong> {{ court.number }}
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-clock me-2"></i>
+                            <strong>Tarifa:</strong> ${{ court.hourly_rate }}/hora
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-calendar me-2"></i>
+                            <strong>Horario:</strong> 7:00 AM - 11:00 PM
+                        </li>
+                    </ul>
+                    
+                    <div class="alert alert-info">
+                        <h3 class="h5 mb-2">
+                            <i class="bi bi-info-circle me-2"></i>Política de Reservas
+                        </h3>
+                        <ul class="mb-0">
+                            <li>Las reservas son por 1 hora</li>
+                            <li>El pago se realiza al momento de la reserva</li>
+                            <li>Puedes cancelar hasta 24 horas antes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

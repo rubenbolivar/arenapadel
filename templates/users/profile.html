@@ -1,0 +1,150 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="#personal-info" class="list-group-item list-group-item-action active" data-bs-toggle="list">
+                    <i class="bi bi-person-fill me-2"></i>Información Personal
+                </a>
+                <a href="#reservations" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="bi bi-calendar-check me-2"></i>Mis Reservas
+                </a>
+                <a href="#payments" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="bi bi-credit-card me-2"></i>Pagos
+                </a>
+                <a href="#preferences" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="bi bi-gear-fill me-2"></i>Preferencias
+                </a>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="col-md-9">
+            <div class="tab-content">
+                <!-- Personal Information -->
+                <div class="tab-pane fade show active" id="personal-info">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="h4 mb-4">Información Personal</h2>
+                            <form method="post" action="{% url 'web:web_profile_update' %}">
+                                {% csrf_token %}
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="id_first_name" class="form-label">Nombre</label>
+                                        <input type="text" class="form-control" id="id_first_name" name="first_name" 
+                                               value="{{ user.first_name }}" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="id_last_name" class="form-label">Apellido</label>
+                                        <input type="text" class="form-control" id="id_last_name" name="last_name" 
+                                               value="{{ user.last_name }}" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="id_email" class="form-label">Correo Electrónico</label>
+                                        <input type="email" class="form-control" id="id_email" name="email" 
+                                               value="{{ user.email }}" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-save me-2"></i>Guardar Cambios
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reservations -->
+                <div class="tab-pane fade" id="reservations">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="h4 mb-4">Mis Reservas</h2>
+                            {% if reservations %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Cancha</th>
+                                                <th>Fecha</th>
+                                                <th>Hora</th>
+                                                <th>Estado</th>
+                                                <th>Precio</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for reservation in reservations %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{% url 'web:web_court_detail' reservation.court.id %}" class="text-decoration-none">
+                                                        {{ reservation.court.name }}
+                                                    </a>
+                                                </td>
+                                                <td>{{ reservation.start_time|date:"d/m/Y" }}</td>
+                                                <td>{{ reservation.start_time|date:"H:i" }} - {{ reservation.end_time|date:"H:i" }}</td>
+                                                <td>
+                                                    {% if reservation.status == 'confirmed' %}
+                                                        <span class="badge bg-success">Confirmada</span>
+                                                    {% elif reservation.status == 'cancelled' %}
+                                                        <span class="badge bg-danger">Cancelada</span>
+                                                    {% elif reservation.status == 'pending' %}
+                                                        <span class="badge bg-warning">Pendiente</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>${{ reservation.total_price }}</td>
+                                                <td>
+                                                    {% if reservation.status == 'confirmed' and reservation.start_time|date:'Y-m-d' > today|date:'Y-m-d' %}
+                                                    <form method="post" action="{% url 'web:web_cancel_reservation' reservation.id %}" class="d-inline">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-danger">
+                                                            <i class="bi bi-x-circle"></i> Cancelar
+                                                        </button>
+                                                    </form>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    No tienes reservas activas. 
+                                    <a href="{% url 'web:web_court_list' %}" class="alert-link">¡Reserva una cancha ahora!</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payments -->
+                <div class="tab-pane fade" id="payments">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="h4 mb-4">Historial de Pagos</h2>
+                            <!-- Aquí irá el contenido de los pagos -->
+                            <p class="text-muted">No hay transacciones registradas.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preferences -->
+                <div class="tab-pane fade" id="preferences">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="h4 mb-4">Preferencias</h2>
+                            <!-- Aquí irán las preferencias del usuario -->
+                            <p class="text-muted">No hay preferencias configuradas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Confirmar Reserva - ArenaPadel.club{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="h3 mb-4">Confirmar Reserva</h1>
+
+                    <!-- Reservation Details -->
+                    <div class="mb-4">
+                        <h2 class="h5 mb-3">Detalles de la Reserva</h2>
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Cancha</span>
+                                <span class="fw-bold">{{ reservation.court.name }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Fecha</span>
+                                <span class="fw-bold">{{ reservation.start_time|date:"d/m/Y" }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Hora</span>
+                                <span class="fw-bold">
+                                    {{ reservation.start_time|time:"H:i" }} - {{ reservation.end_time|time:"H:i" }}
+                                </span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Duración</span>
+                                <span class="fw-bold">{{ duration }} hora(s)</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Total</span>
+                                <span class="fw-bold text-primary">${{ total }}</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Payment Methods -->
+                    <div class="mb-4">
+                        <h2 class="h5 mb-3">Método de Pago</h2>
+                        <form id="payment-form" method="post" action="{% url 'process_payment' reservation.id %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" id="id_payment_method" name="payment_method" value="">
+
+                            <div class="row g-3">
+                                <!-- Credit Card -->
+                                <div class="col-md-4">
+                                    <div class="card payment-method h-100" data-method="stripe">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-credit-card fa-2x mb-2"></i>
+                                            <h3 class="h6">Tarjeta de Crédito</h3>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Bank Transfer -->
+                                <div class="col-md-4">
+                                    <div class="card payment-method h-100" data-method="transfer">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-university fa-2x mb-2"></i>
+                                            <h3 class="h6">Transferencia Bancaria</h3>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Cash -->
+                                <div class="col-md-4">
+                                    <div class="card payment-method h-100" data-method="cash">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-money-bill fa-2x mb-2"></i>
+                                            <h3 class="h6">Efectivo</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stripe Fields -->
+                            <div id="stripe-fields" class="mt-4" style="display: none;">
+                                <div id="card-element" class="form-control mb-3">
+                                    <!-- Stripe Elements will be inserted here -->
+                                </div>
+                                <div id="card-errors" class="text-danger mb-3"></div>
+                            </div>
+
+                            <!-- Bank Transfer Fields -->
+                            <div id="transfer-fields" class="mt-4" style="display: none;">
+                                <div class="alert alert-info">
+                                    <h4 class="h6">Datos Bancarios:</h4>
+                                    <p class="mb-0">
+                                        Banco: {{ bank_info.bank_name }}<br>
+                                        Cuenta: {{ bank_info.account_number }}<br>
+                                        Titular: {{ bank_info.account_holder }}<br>
+                                        RIF: {{ bank_info.tax_id }}
+                                    </p>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="id_proof_of_payment" class="form-label">Comprobante de Pago</label>
+                                    <input type="file" class="form-control" id="id_proof_of_payment" name="proof_of_payment">
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    Confirmar y Pagar
+                                </button>
+                                <a href="{% url 'court_detail' reservation.court.id %}" class="btn btn-outline-secondary">
+                                    Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    // Initialize payment methods
+    document.addEventListener('DOMContentLoaded', function() {
+        initializePayment();
+    });
+</script>
+{% endblock %}
