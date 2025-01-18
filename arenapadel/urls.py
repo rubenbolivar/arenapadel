@@ -24,12 +24,12 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="ArenaPadel API",
+        title="Arenas Padel API",
         default_version='v1',
-        description="API for ArenaPadel.club reservation system",
-        terms_of_service="https://www.arenapadel.club/terms/",
-        contact=openapi.Contact(email="contact@arenapadel.club"),
-        license=openapi.License(name="Proprietary"),
+        description="API for ArenasPadel.club reservation system",
+        terms_of_service="https://www.arenaspadel.club/terms/",
+        contact=openapi.Contact(email="contact@arenaspadel.club"),
+        license=openapi.License(name="BSD License"),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),

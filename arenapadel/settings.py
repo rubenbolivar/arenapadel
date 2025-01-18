@@ -152,13 +152,13 @@ MESSAGE_TAGS = {
 
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'no-reply@arenapadel.club')
-ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'admin@arenapadel.club')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'no-reply@arenaspadel.club')
+ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'admin@arenaspadel.club')
 
 # Security settings
 if not DEBUG:
@@ -177,7 +177,7 @@ STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', 'your-stripe-webhook-secret')
 
 # Payment methods info
-ZELLE_EMAIL = os.getenv('ZELLE_EMAIL', 'payments@arenapadel.club')
+ZELLE_EMAIL = os.getenv('ZELLE_EMAIL', 'payments@arenaspadel.club')
 PAGO_MOVIL_PHONE = os.getenv('PAGO_MOVIL_PHONE', '0414-1234567')
 PAGO_MOVIL_BANK = os.getenv('PAGO_MOVIL_BANK', 'Banesco')
 PAGO_MOVIL_ID = os.getenv('PAGO_MOVIL_ID', 'V-12345678')
