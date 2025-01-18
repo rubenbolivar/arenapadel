@@ -23,10 +23,10 @@ wheels/
 # Django
 *.log
 local_settings.py
-db.sqlite3
-db.sqlite3-journal
-media/
-staticfiles/
+# db.sqlite3  # Temporalmente incluido para migración
+# db.sqlite3-journal
+# media/  # Temporalmente incluido para migración
+# staticfiles/  # Temporalmente incluido para migración
 
 # Virtual Environment
 venv/
@@ -41,6 +41,6 @@ ENV/
 .DS_Store
 
 # Environment variables
-.env
+# .env  # Comentado temporalmente durante la configuración
 .env.local
 .env.*.local
