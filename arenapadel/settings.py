@@ -27,7 +27,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['arenaspadel.club', 'www.arenaspadel.club', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['arenaspadel.club', 'www.arenaspadel.club', 'localhost', '127.0.0.1', '209.74.72.12']
 
 # Application definition
 
