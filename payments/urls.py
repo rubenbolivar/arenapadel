@@ -1,28 +1,30 @@
 from django.urls import path
-from rest_framework.routers import DefaultRouter
 from . import views
 
 app_name = 'payments'
 
-router = DefaultRouter()
-router.register(r'', views.PaymentViewSet)
-
 urlpatterns = [
-    path('methods/', 
-         views.PaymentMethodsView.as_view(), 
-         name='payment-methods'),
-    path('stripe/create-payment-intent/', 
-         views.StripePaymentIntentView.as_view(), 
-         name='create-payment-intent'),
-    path('stripe/webhook/', 
-         views.StripeWebhookView.as_view(), 
-         name='stripe-webhook'),
-    path('validate-payment/<int:payment_id>/', 
-         views.ValidatePaymentView.as_view(), 
-         name='validate-payment'),
-    path('my-payments/', 
-         views.UserPaymentsView.as_view(), 
-         name='my-payments'),
+    path('reservation/<int:reservation_id>/payment/', 
+         views.payment_method_selection, 
+         name='payment_method_selection'),
+    
+    path('reservation/<int:reservation_id>/create-checkout-session/',
+         views.create_stripe_checkout_session,
+         name='create_checkout_session'),
+    
+    path('reservation/<int:reservation_id>/manual-confirmation/',
+         views.manual_payment_confirmation,
+         name='manual_payment_confirmation'),
+    
+    path('webhook/stripe/',
+         views.stripe_webhook,
+         name='stripe_webhook'),
+    
+    path('reservation/<int:reservation_id>/success/',
+         views.payment_success,
+         name='payment_success'),
+    
+    path('reservation/<int:reservation_id>/cancel/',
+         views.payment_cancel,
+         name='payment_cancel'),
 ]
-
-urlpatterns += router.urls

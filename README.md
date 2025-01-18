@@ -1,77 +1,71 @@
-# ArenaPadel.club - Sistema de Reservas
+# ArenaPadel.club
 
-Sistema de gestión de reservas para canchas de pádel con interfaz moderna y experiencia de usuario optimizada.
+Sistema de reservas para canchas de pádel desarrollado con Django.
 
-## Características Principales
+## Características
 
-- Gestión de 12 canchas de pádel
-- Sistema de reservas por hora
-- Múltiples métodos de pago
-- Notificaciones vía WhatsApp
-- Panel administrativo completo
-- API REST para futura expansión
+- Sistema de autenticación de usuarios
+- Gestión de canchas de pádel
+- Sistema de reservas con confirmación
+- Panel de usuario con historial de reservas
+- Capacidad para cancelar reservas
+- Interfaz responsive y amigable
 
 ## Requisitos
 
-- Python 3.10+
-- PostgreSQL 13+
-- Node.js 18+ (para desarrollo frontend)
+- Python 3.8+
+- Django 4.2.18
+- Otras dependencias en `requirements.txt`
 
 ## Instalación
 
-1. Clonar el repositorio
+1. Clonar el repositorio:
 ```bash
-git clone https://github.com/your-repo/arenapadel.git
+git clone <URL_DEL_REPOSITORIO>
 cd arenapadel
 ```
 
-2. Crear entorno virtual
+2. Crear y activar entorno virtual:
 ```bash
 python -m venv venv
 source venv/bin/activate  # En Windows: venv\Scripts\activate
 ```
 
-3. Instalar dependencias
+3. Instalar dependencias:
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Configurar variables de entorno
-```bash
-cp .env.example .env
-# Editar .env con las configuraciones necesarias
-```
-
-5. Ejecutar migraciones
+4. Aplicar migraciones:
 ```bash
 python manage.py migrate
 ```
 
-6. Iniciar servidor de desarrollo
+5. Crear superusuario (opcional):
+```bash
+python manage.py createsuperuser
+```
+
+6. Ejecutar servidor de desarrollo:
 ```bash
 python manage.py runserver
 ```
 
-## Estructura del Proyecto
+## Uso
 
-```
-arenapadel/
-├── apps/
-│   ├── reservations/    # Gestión de reservas
-│   ├── users/           # Gestión de usuarios
-│   └── payments/        # Sistema de pagos
-├── config/              # Configuraciones del proyecto
-├── static/              # Archivos estáticos
-└── templates/           # Plantillas HTML
-```
+1. Acceder a http://localhost:8000
+2. Registrarse o iniciar sesión
+3. Navegar a la lista de canchas
+4. Seleccionar una cancha y realizar una reserva
 
-## Documentación
+## Desarrollo
 
-Para más información, consultar:
-- [Manual de Usuario](docs/user-manual.md)
-- [Documentación API](docs/api.md)
-- [Guía de Mantenimiento](docs/maintenance.md)
+El proyecto sigue una estructura modular con las siguientes apps:
+
+- `users`: Gestión de usuarios y autenticación
+- `reservations`: Sistema de reservas
+- `payments`: Sistema de pagos (en desarrollo)
 
 ## Licencia
 
-Todos los derechos reservados - ArenaPadel.club
+MIT
