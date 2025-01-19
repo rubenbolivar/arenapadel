@@ -76,7 +76,7 @@
                     
                     <!-- Action Button -->
                     <div class="d-grid">
-                        <a href="{% url 'web:web_court_detail' court.id %}{% if request.GET.date and request.GET.time %}?date={{ request.GET.date }}&time={{ request.GET.time }}{% endif %}" 
+                        <a href="{% url 'court_detail' court.id %}{% if request.GET.date and request.GET.time %}?date={{ request.GET.date }}&time={{ request.GET.time }}{% endif %}" 
                            class="btn btn-primary">
                             {% if request.GET.date and request.GET.time %}
                                 <i class="bi bi-calendar-check me-2"></i>Reservar Ahora

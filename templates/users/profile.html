@@ -29,7 +29,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h2 class="h4 mb-4">Información Personal</h2>
-                            <form method="post" action="{% url 'web:web_profile_update' %}">
+                            <form method="post" action="{% url 'profile_edit' %}">
                                 {% csrf_token %}
                                 <div class="row g-3">
                                     <div class="col-md-6">
@@ -80,7 +80,7 @@
                                             {% for reservation in reservations %}
                                             <tr>
                                                 <td>
-                                                    <a href="{% url 'web:web_court_detail' reservation.court.id %}" class="text-decoration-none">
+                                                    <a href="{% url 'court_detail' reservation.court.id %}" class="text-decoration-none">
                                                         {{ reservation.court.name }}
                                                     </a>
                                                 </td>
@@ -98,7 +98,7 @@
                                                 <td>${{ reservation.total_price }}</td>
                                                 <td>
                                                     {% if reservation.status == 'confirmed' and reservation.start_time|date:'Y-m-d' > today|date:'Y-m-d' %}
-                                                    <form method="post" action="{% url 'web:web_cancel_reservation' reservation.id %}" class="d-inline">
+                                                    <form method="post" action="{% url 'reservation_cancel' reservation.id %}" class="d-inline">
                                                         {% csrf_token %}
                                                         <button type="submit" class="btn btn-sm btn-danger">
                                                             <i class="bi bi-x-circle"></i> Cancelar
@@ -115,7 +115,7 @@
                                 <div class="alert alert-info">
                                     <i class="bi bi-info-circle me-2"></i>
                                     No tienes reservas activas. 
-                                    <a href="{% url 'web:web_court_list' %}" class="alert-link">¡Reserva una cancha ahora!</a>
+                                    <a href="{% url 'court_list' %}" class="alert-link">¡Reserva una cancha ahora!</a>
                                 </div>
                             {% endif %}
                         </div>

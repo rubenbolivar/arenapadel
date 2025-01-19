@@ -153,7 +153,7 @@
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" id="id_terms" name="terms" required>
                                     <label class="form-check-label" for="id_terms">
-                                        Acepto los <a href="{% url 'web:web_terms' %}" target="_blank">términos y condiciones</a>
+                                        Acepto los <a href="{% url 'terms' %}" target="_blank">términos y condiciones</a>
                                     </label>
                                 </div>
                             </div>
@@ -170,7 +170,7 @@
 
                     <div class="text-center">
                         <p class="mb-0">¿Ya tienes una cuenta?</p>
-                        <a href="{% url 'web:web_login' %}" class="btn btn-outline-primary mt-2">
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary mt-2">
                             <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
                         </a>
                     </div>
