@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
 
@@ -18,6 +18,7 @@ urlpatterns = [
     path('my-reservations/', 
          views.UserReservationsView.as_view(), 
          name='reservation_list'),
+    path('confirm/<int:reservation_id>/', views.reservation_confirm_view, name='reservation_confirm'),
 ]
 
 urlpatterns += router.urls

@@ -1,10 +1,27 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 from rest_framework import viewsets, generics, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.utils import timezone
 from .models import Court, Reservation
 from .serializers import CourtSerializer, ReservationSerializer
+
+# Template Views
+@login_required
+def reservation_confirm_view(request, reservation_id):
+    reservation = get_object_or_404(Reservation, id=reservation_id, user=request.user)
+    duration = (reservation.end_time - reservation.start_time).seconds / 3600
+    total = reservation.court.price_per_hour * duration
+    
+    context = {
+        'reservation': reservation,
+        'duration': duration,
+        'total': total
+    }
+    return render(request, 'reservations/reservation_confirm.html', context)
+
+# API Views
 
 # Create your views here.
 
