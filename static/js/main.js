@@ -1,6 +1,6 @@
 // Court Availability Check
 function checkCourtAvailability(courtId, date) {
-    fetch(`/api/courts/${courtId}/availability/?date=${date}`)
+    fetch(`/api/reservations/courts/${courtId}/availability/?date=${date}`)
         .then(response => response.json())
         .then(data => {
             updateTimeSlots(data.available_slots);
@@ -134,7 +134,7 @@ function initializeCalendar(courtId) {
 }
 
 function fetchAvailability(courtId, year, month) {
-    fetch(`/api/reservations/courts/${courtId}/availability/?year=${year}&month=${month}`)
+    fetch(`/api/reservations/courts/${courtId}/schedule/?year=${year}&month=${month}`)
         .then(response => response.json())
         .then(data => {
             updateCalendar(data.availability);
@@ -199,6 +199,7 @@ function calculatePrice() {
             })
             .catch(error => {
                 console.error('Error calculating price:', error);
+                showAlert('Error calculating price. Please try again.', 'danger');
             });
     }
 }
