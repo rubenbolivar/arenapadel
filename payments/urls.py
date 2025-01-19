@@ -6,19 +6,19 @@ app_name = 'payments'
 urlpatterns = [
     path('reservation/<int:reservation_id>/payment/', 
          views.payment_method_selection, 
-         name='payment_method_selection'),
+         name='payment_select'),
     
     path('reservation/<int:reservation_id>/create-checkout-session/',
          views.create_stripe_checkout_session,
-         name='create_checkout_session'),
+         name='payment_create'),
     
     path('reservation/<int:reservation_id>/manual-confirmation/',
          views.manual_payment_confirmation,
-         name='manual_payment_confirmation'),
+         name='payment_confirm'),
     
     path('webhook/stripe/',
          views.stripe_webhook,
-         name='stripe_webhook'),
+         name='payment_webhook'),
     
     path('reservation/<int:reservation_id>/success/',
          views.payment_success,

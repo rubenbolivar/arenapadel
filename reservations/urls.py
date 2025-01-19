@@ -11,13 +11,13 @@ router.register(r'', views.ReservationViewSet)
 urlpatterns = [
     path('courts/<int:court_id>/availability/', 
          views.CourtAvailabilityView.as_view(), 
-         name='court-availability'),
+         name='court_availability'),
     path('courts/<int:court_id>/schedule/', 
          views.CourtScheduleView.as_view(), 
-         name='court-schedule'),
+         name='court_schedule'),
     path('my-reservations/', 
          views.UserReservationsView.as_view(), 
-         name='my-reservations'),
+         name='reservation_list'),
 ]
 
 urlpatterns += router.urls

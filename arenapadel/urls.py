@@ -29,7 +29,7 @@ schema_view = get_schema_view(
         description="API for ArenasPadel.club reservation system",
         terms_of_service="https://www.arenaspadel.club/terms/",
         contact=openapi.Contact(email="contact@arenaspadel.club"),
-        license=openapi.License(name="BSD License"),
+        license=openapi.License(name="BSD"),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
@@ -41,8 +41,8 @@ urlpatterns = [
     path('api/users/', include('users.urls')),
     path('api/reservations/', include('reservations.urls')),
     path('api/payments/', include('payments.urls')),
-    path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('api/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='api_docs_swagger'),
+    path('api/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='api_docs_redoc'),
 ]
 
 if settings.DEBUG:
