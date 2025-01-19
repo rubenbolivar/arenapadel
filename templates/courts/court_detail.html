@@ -10,8 +10,8 @@
         <div class="col-12">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url 'web:web_home' %}">Inicio</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'web:web_court_list' %}">Canchas</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'court_list' %}">Canchas</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ court.name }}</li>
                 </ol>
             </nav>
@@ -23,7 +23,7 @@
                 </div>
                 {% if selected_date and selected_hour and is_available %}
                 <div>
-                    <form method="post" action="{% url 'web:web_create_reservation' court.id %}">
+                    <form method="post" action="{% url 'create_reservation' court.id %}">
                         {% csrf_token %}
                         <input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">
                         <input type="hidden" name="time" value="{{ selected_hour }}">
@@ -63,7 +63,7 @@
                                     <td>
                                         <div class="btn-group-vertical w-100">
                                             {% for hour in available_hours %}
-                                            <a href="{% url 'web:web_court_detail' court.id %}?date={{ date|date:'Y-m-d' }}&time={{ hour }}"
+                                            <a href="{% url 'court_detail' court.id %}?date={{ date|date:'Y-m-d' }}&time={{ hour }}"
                                                class="btn btn-sm {% if not availability|default:False %}btn-outline-danger disabled{% else %}btn-outline-success{% endif %} mb-1
                                                       {% if date == selected_date and hour == selected_hour %}active{% endif %}">
                                                 {{ hour }}:00
