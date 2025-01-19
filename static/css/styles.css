@@ -24,12 +24,28 @@ main {
 
 /* Navigation */
 .navbar {
+    background-color: var(--primary-color);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1rem 0;
 }
 
 .navbar-brand {
     font-weight: 600;
     font-size: 1.5rem;
+    color: white !important;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255,255,255,0.9);
+    font-weight: 500;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: white;
+}
+
+.navbar-dark .navbar-toggler {
+    border-color: rgba(255,255,255,0.5);
 }
 
 /* Cards */
