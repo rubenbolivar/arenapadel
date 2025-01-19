@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from rest_framework import viewsets, generics, permissions
@@ -9,10 +9,39 @@ from .serializers import CourtSerializer, ReservationSerializer
 
 # Template Views
 @login_required
+def court_reserve_view(request, court_id):
+    court = get_object_or_404(Court, id=court_id)
+    
+    if request.method == 'POST':
+        start_time = request.POST.get('start_time')
+        duration = float(request.POST.get('duration', 1))
+        
+        if start_time:
+            start_time = timezone.datetime.strptime(start_time, '%Y-%m-%d %H:%M')
+            end_time = start_time + timezone.timedelta(hours=duration)
+            
+            reservation = Reservation.objects.create(
+                user=request.user,
+                court=court,
+                start_time=start_time,
+                end_time=end_time,
+                status='pending'
+            )
+            
+            return redirect('reservations:reservation_confirm', reservation_id=reservation.id)
+    
+    context = {
+        'court': court,
+        'min_date': timezone.now().date(),
+        'max_date': (timezone.now() + timezone.timedelta(days=30)).date(),
+    }
+    return render(request, 'reservations/court_reserve.html', context)
+
+@login_required
 def reservation_confirm_view(request, reservation_id):
     reservation = get_object_or_404(Reservation, id=reservation_id, user=request.user)
     duration = (reservation.end_time - reservation.start_time).seconds / 3600
-    total = reservation.court.price_per_hour * duration
+    total = reservation.court.hourly_rate * duration
     
     context = {
         'reservation': reservation,
