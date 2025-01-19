@@ -2,8 +2,6 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
 
-app_name = 'web'
-
 urlpatterns = [
     path('', views.home, name='home'),
     path('courts/', views.court_list, name='court_list'),

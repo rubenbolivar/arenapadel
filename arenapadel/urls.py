@@ -36,7 +36,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('', include('arenapadel.web_urls')),  # Agregamos las rutas web
+    path('', include('arenapadel.web_urls')),  # Rutas web sin namespace
     path('admin/', admin.site.urls),
     path('api/users/', include('users.urls')),
     path('api/reservations/', include('reservations.urls')),
