@@ -1,13 +1,15 @@
 /* Variables */
 :root {
-    --primary-color: #1e88e5;
-    --secondary-color: #26c6da;
+    --primary-color: #017f97;
+    --secondary-color: #4c3f78;
+    --accent-color: #6f63a8;
+    --light-color: #a4bdbd;
+    --white-color: #ffffff;
+    --dark-color: #212121;
     --success-color: #66bb6a;
-    --info-color: #29b6f6;
     --warning-color: #ffa726;
     --danger-color: #ef5350;
-    --light-color: #f5f5f5;
-    --dark-color: #212121;
+    --info-color: #29b6f6;
 }
 
 /* General Styles */
@@ -32,20 +34,21 @@ main {
 .navbar-brand {
     font-weight: 600;
     font-size: 1.5rem;
-    color: white !important;
+    color: var(--white-color) !important;
 }
 
 .navbar-dark .navbar-nav .nav-link {
-    color: rgba(255,255,255,0.9);
+    color: var(--light-color);
     font-weight: 500;
+    transition: color 0.3s ease;
 }
 
 .navbar-dark .navbar-nav .nav-link:hover {
-    color: white;
+    color: var(--white-color);
 }
 
 .navbar-dark .navbar-toggler {
-    border-color: rgba(255,255,255,0.5);
+    border-color: var(--light-color);
 }
 
 /* Cards */
@@ -107,7 +110,7 @@ main {
 /* Forms */
 .form-control:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(30, 136, 229, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(1, 127, 151, 0.25);
 }
 
 .btn-primary {
@@ -116,8 +119,8 @@ main {
 }
 
 .btn-primary:hover {
-    background-color: #1976d2;
-    border-color: #1976d2;
+    background-color: #016b85;
+    border-color: #016b85;
 }
 
 /* Calendar */
