@@ -7,43 +7,45 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
+            <div class="card reservation-card animate-slide-in">
+                <div class="card-header bg-primary text-white py-3">
+                    <h1 class="h4 mb-0">Confirmar Reserva</h1>
+                </div>
+                
                 <div class="card-body">
-                    <h1 class="h3 mb-4">Confirmar Reserva</h1>
-
                     <!-- Reservation Details -->
                     <div class="mb-4">
                         <h2 class="h5 mb-3">Detalles de la Reserva</h2>
-                        <ul class="list-group">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>Cancha</span>
-                                <span class="fw-bold">{{ reservation.court.name }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>Fecha</span>
+                        <div class="list-group">
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-volleyball-ball me-2"></i>Cancha</span>
+                                <span class="fw-bold text-primary">{{ reservation.court.name }}</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="far fa-calendar me-2"></i>Fecha</span>
                                 <span class="fw-bold">{{ reservation.start_time|date:"d/m/Y" }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>Hora</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="far fa-clock me-2"></i>Hora</span>
                                 <span class="fw-bold">
                                     {{ reservation.start_time|time:"H:i" }} - {{ reservation.end_time|time:"H:i" }}
                                 </span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>Duración</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-hourglass-half me-2"></i>Duración</span>
                                 <span class="fw-bold">{{ duration }} hora(s)</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>Total</span>
-                                <span class="fw-bold text-primary">${{ total }}</span>
-                            </li>
-                        </ul>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-tag me-2"></i>Total</span>
+                                <span class="fw-bold h4 mb-0 text-primary">${{ total }}</span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Payment Methods -->
                     <div class="mb-4">
                         <h2 class="h5 mb-3">Método de Pago</h2>
-                        <form id="payment-form" method="post" action="{% url 'process_payment' reservation.id %}" enctype="multipart/form-data">
+                        <form id="payment-form" method="post" action="{% url 'process_payment' reservation.id %}" class="needs-validation" novalidate>
                             {% csrf_token %}
                             <input type="hidden" id="id_payment_method" name="payment_method" value="">
 
@@ -51,9 +53,9 @@
                                 <!-- Credit Card -->
                                 <div class="col-md-4">
                                     <div class="card payment-method h-100" data-method="stripe">
-                                        <div class="card-body text-center">
-                                            <i class="fas fa-credit-card fa-2x mb-2"></i>
-                                            <h3 class="h6">Tarjeta de Crédito</h3>
+                                        <div class="card-body text-center py-4">
+                                            <i class="fas fa-credit-card fa-2x mb-3 text-primary"></i>
+                                            <h3 class="h6 mb-0">Tarjeta de Crédito</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -61,9 +63,9 @@
                                 <!-- Bank Transfer -->
                                 <div class="col-md-4">
                                     <div class="card payment-method h-100" data-method="transfer">
-                                        <div class="card-body text-center">
-                                            <i class="fas fa-university fa-2x mb-2"></i>
-                                            <h3 class="h6">Transferencia Bancaria</h3>
+                                        <div class="card-body text-center py-4">
+                                            <i class="fas fa-university fa-2x mb-3 text-primary"></i>
+                                            <h3 class="h6 mb-0">Transferencia Bancaria</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -71,9 +73,9 @@
                                 <!-- Cash -->
                                 <div class="col-md-4">
                                     <div class="card payment-method h-100" data-method="cash">
-                                        <div class="card-body text-center">
-                                            <i class="fas fa-money-bill fa-2x mb-2"></i>
-                                            <h3 class="h6">Efectivo</h3>
+                                        <div class="card-body text-center py-4">
+                                            <i class="fas fa-money-bill fa-2x mb-3 text-primary"></i>
+                                            <h3 class="h6 mb-0">Efectivo</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -87,30 +89,12 @@
                                 <div id="card-errors" class="text-danger mb-3"></div>
                             </div>
 
-                            <!-- Bank Transfer Fields -->
-                            <div id="transfer-fields" class="mt-4" style="display: none;">
-                                <div class="alert alert-info">
-                                    <h4 class="h6">Datos Bancarios:</h4>
-                                    <p class="mb-0">
-                                        Banco: {{ bank_info.bank_name }}<br>
-                                        Cuenta: {{ bank_info.account_number }}<br>
-                                        Titular: {{ bank_info.account_holder }}<br>
-                                        RIF: {{ bank_info.tax_id }}
-                                    </p>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="id_proof_of_payment" class="form-label">Comprobante de Pago</label>
-                                    <input type="file" class="form-control" id="id_proof_of_payment" name="proof_of_payment">
-                                </div>
-                            </div>
-
-                            <!-- Submit Button -->
-                            <div class="d-grid gap-2 mt-4">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    Confirmar y Pagar
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary action-button w-100">
+                                    <i class="fas fa-check-circle me-2"></i>Confirmar Reserva
                                 </button>
-                                <a href="{% url 'court_detail' reservation.court.id %}" class="btn btn-outline-secondary">
-                                    Cancelar
+                                <a href="{% url 'court_list' %}" class="btn btn-outline-secondary action-button w-100 mt-2">
+                                    <i class="fas fa-times-circle me-2"></i>Cancelar
                                 </a>
                             </div>
                         </form>
@@ -125,9 +109,46 @@
 {% block extra_js %}
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-    // Initialize payment methods
-    document.addEventListener('DOMContentLoaded', function() {
-        initializePayment();
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentMethods = document.querySelectorAll('.payment-method');
+    const paymentMethodInput = document.getElementById('id_payment_method');
+    const stripeFields = document.getElementById('stripe-fields');
+
+    paymentMethods.forEach(method => {
+        method.addEventListener('click', function() {
+            // Remove active class from all methods
+            paymentMethods.forEach(m => m.classList.remove('border-primary'));
+            
+            // Add active class to selected method
+            this.classList.add('border-primary');
+            
+            // Set payment method value
+            const methodValue = this.dataset.method;
+            paymentMethodInput.value = methodValue;
+            
+            // Show/hide Stripe fields
+            if (methodValue === 'stripe') {
+                stripeFields.style.display = 'block';
+            } else {
+                stripeFields.style.display = 'none';
+            }
+        });
     });
+
+    // Form validation
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', function(event) {
+        if (!paymentMethodInput.value) {
+            event.preventDefault();
+            showError('Por favor selecciona un método de pago');
+        } else {
+            // Show confirmation message
+            const courtName = '{{ reservation.court.name }}';
+            const date = '{{ reservation.start_time|date:"d/m/Y" }}';
+            const time = '{{ reservation.start_time|time:"H:i" }}';
+            showReservationConfirmation(courtName, date, time);
+        }
+    });
+});
 </script>
 {% endblock %}

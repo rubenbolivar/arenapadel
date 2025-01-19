@@ -4,7 +4,7 @@ from .models import Court, Reservation
 class CourtSerializer(serializers.ModelSerializer):
     class Meta:
         model = Court
-        fields = ['id', 'name', 'description', 'price_per_hour']
+        fields = ['id', 'name', 'number', 'hourly_rate', 'is_active']
 
 class ReservationSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)
