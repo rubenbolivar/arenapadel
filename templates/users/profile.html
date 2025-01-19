@@ -29,7 +29,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h2 class="h4 mb-4">Información Personal</h2>
-                            <form method="post" action="{% url 'profile_edit' %}">
+                            <form method="post" action="{% url 'users:profile_edit' %}">
                                 {% csrf_token %}
                                 <div class="row g-3">
                                     <div class="col-md-6">
@@ -79,31 +79,21 @@
                                         <tbody>
                                             {% for reservation in reservations %}
                                             <tr>
-                                                <td>
-                                                    <a href="{% url 'court_detail' reservation.court.id %}" class="text-decoration-none">
-                                                        {{ reservation.court.name }}
-                                                    </a>
-                                                </td>
+                                                <td>{{ reservation.court.name }}</td>
                                                 <td>{{ reservation.start_time|date:"d/m/Y" }}</td>
-                                                <td>{{ reservation.start_time|date:"H:i" }} - {{ reservation.end_time|date:"H:i" }}</td>
+                                                <td>{{ reservation.start_time|time:"H:i" }} - {{ reservation.end_time|time:"H:i" }}</td>
                                                 <td>
-                                                    {% if reservation.status == 'confirmed' %}
-                                                        <span class="badge bg-success">Confirmada</span>
-                                                    {% elif reservation.status == 'cancelled' %}
-                                                        <span class="badge bg-danger">Cancelada</span>
-                                                    {% elif reservation.status == 'pending' %}
-                                                        <span class="badge bg-warning">Pendiente</span>
-                                                    {% endif %}
+                                                    <span class="badge bg-{{ reservation.status|lower }}">
+                                                        {{ reservation.get_status_display }}
+                                                    </span>
                                                 </td>
-                                                <td>${{ reservation.total_price }}</td>
+                                                <td>${{ reservation.court.hourly_rate }}</td>
                                                 <td>
-                                                    {% if reservation.status == 'confirmed' and reservation.start_time|date:'Y-m-d' > today|date:'Y-m-d' %}
-                                                    <form method="post" action="{% url 'reservation_cancel' reservation.id %}" class="d-inline">
-                                                        {% csrf_token %}
-                                                        <button type="submit" class="btn btn-sm btn-danger">
-                                                            <i class="bi bi-x-circle"></i> Cancelar
-                                                        </button>
-                                                    </form>
+                                                    {% if reservation.status == 'pending' %}
+                                                    <a href="{% url 'reservations:reservation_confirm' reservation.id %}" 
+                                                       class="btn btn-sm btn-primary">
+                                                        <i class="bi bi-check-circle me-1"></i>Confirmar
+                                                    </a>
                                                     {% endif %}
                                                 </td>
                                             </tr>
@@ -112,11 +102,7 @@
                                     </table>
                                 </div>
                             {% else %}
-                                <div class="alert alert-info">
-                                    <i class="bi bi-info-circle me-2"></i>
-                                    No tienes reservas activas. 
-                                    <a href="{% url 'court_list' %}" class="alert-link">¡Reserva una cancha ahora!</a>
-                                </div>
+                                <p class="text-muted">No tienes reservas activas.</p>
                             {% endif %}
                         </div>
                     </div>
@@ -127,8 +113,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h2 class="h4 mb-4">Historial de Pagos</h2>
-                            <!-- Aquí irá el contenido de los pagos -->
-                            <p class="text-muted">No hay transacciones registradas.</p>
+                            <p class="text-muted">No hay pagos registrados.</p>
                         </div>
                     </div>
                 </div>
