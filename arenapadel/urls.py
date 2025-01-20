@@ -40,7 +40,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/users/', include('users.urls')),
     path('api/reservations/', include('reservations.urls')),
-    path('api/payments/', include('payments.urls')),
+    path('api/payments/', include('payments.urls', namespace='api_payments')),
     path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='api_docs'),
     path('api/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='api_docs_redoc'),
 ]

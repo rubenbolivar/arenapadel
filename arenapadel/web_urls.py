@@ -9,6 +9,7 @@ urlpatterns = [
     path('courts/<int:court_id>/', views.court_detail, name='court_detail'),
     path('courts/<int:court_id>/reserve/', court_reserve_view, name='reservation_create'),
     path('reservations/<int:reservation_id>/cancel/', views.cancel_reservation, name='reservation_cancel'),
+    path('payments/', include('payments.urls', namespace='web_payments')),  # Web routes for payments
     path('profile/', views.profile, name='profile'),
     path('profile/update/', views.profile_update, name='profile_edit'),
     path('login/', views.login_view, name='login'),
