@@ -67,12 +67,34 @@ def court_detail(request, court_id):
     today = timezone.now().date()
     next_week_dates = [today + timedelta(days=i) for i in range(7)]
     
+    # Create a dictionary to store availability for each date and hour
+    availability = {}
+    for date in next_week_dates:
+        availability[date] = {}
+        for hour in available_hours:
+            # Create datetime objects for this time slot
+            start_datetime = timezone.make_aware(
+                datetime.combine(date, datetime.min.time().replace(hour=hour))
+            )
+            end_datetime = start_datetime + timedelta(hours=1)
+            
+            # Check if there are any confirmed reservations for this time slot
+            is_slot_available = not Reservation.objects.filter(
+                court=court,
+                status='confirmed',
+                start_time__lt=end_datetime,
+                end_time__gt=start_datetime
+            ).exists()
+            
+            availability[date][hour] = is_slot_available
+    
     # Initialize context
     context = {
         'court': court,
         'available_hours': available_hours,
         'today': today,
         'next_week_dates': next_week_dates,
+        'availability': availability,
         'selected_date': None,
         'selected_hour': None,
         'is_available': False,
@@ -91,13 +113,8 @@ def court_detail(request, court_id):
             )
             end_datetime = selected_datetime + timedelta(hours=1)
             
-            # Check if there are any confirmed reservations for this time slot
-            is_available = not Reservation.objects.filter(
-                court=court,
-                status='confirmed',
-                start_time__lt=end_datetime,
-                end_time__gt=selected_datetime
-            ).exists()
+            # Get availability from our pre-calculated dictionary
+            is_available = availability[selected_date][selected_hour]
             
             context.update({
                 'selected_date': selected_date,

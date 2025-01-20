@@ -1,5 +1,6 @@
 {% extends 'base/base.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block title %}{{ court.name }} - ArenaPadel.club{% endblock %}
 
@@ -64,7 +65,7 @@
                                         <div class="btn-group-vertical w-100">
                                             {% for hour in available_hours %}
                                             <a href="{% url 'court_detail' court.id %}?date={{ date|date:'Y-m-d' }}&time={{ hour }}"
-                                               class="btn btn-sm {% if not is_available %}btn-outline-danger disabled{% else %}btn-outline-success{% endif %} mb-1
+                                               class="btn btn-sm {% if not availability|get_item:date|get_item:hour %}btn-outline-danger disabled{% else %}btn-outline-success{% endif %} mb-1
                                                       {% if date == selected_date and hour == selected_hour %}active{% endif %}">
                                                 {{ hour }}:00
                                             </a>
