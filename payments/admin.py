@@ -7,22 +7,25 @@ from .models import Payment
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('reservation', 'user', 'amount', 'payment_method', 'status', 'created_at', 'view_proof_of_payment')
-    list_filter = ('status', 'payment_method', 'created_at')
-    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'reservation__court__name', 'transaction_id')
+    list_display = ['id', 'user', 'reservation', 'amount', 'payment_method', 'status', 'created_at']
+    list_filter = ['payment_method', 'status', 'created_at']
+    search_fields = ['user__username', 'user__email', 'reservation__court__name']
+    readonly_fields = ['created_at', 'updated_at']
     ordering = ('-created_at',)
     date_hierarchy = 'created_at'
     
     fieldsets = (
-        (None, {
-            'fields': ('reservation', 'user', 'amount')
+        ('Información Básica', {
+            'fields': ('reservation', 'user', 'amount', 'payment_method', 'status')
         }),
-        (_('Payment Details'), {
-            'fields': ('payment_method', 'status', 'transaction_id', 'proof_of_payment')
+        (_('Comprobante'), {
+            'fields': ('proof_of_payment', 'notes')
         }),
-        (_('Additional Information'), {
-            'fields': ('notes',),
-            'classes': ('collapse',)
+        (_('Validación'), {
+            'fields': ('validated_by', 'validated_at')
+        }),
+        (_('Fechas'), {
+            'fields': ('created_at', 'updated_at')
         }),
     )
     
@@ -34,5 +37,8 @@ class PaymentAdmin(admin.ModelAdmin):
     
     def get_readonly_fields(self, request, obj=None):
         if obj:  # editing an existing object
-            return ('reservation', 'user', 'amount')
+            return ('reservation', 'user', 'amount', 'created_at', 'updated_at')
         return ()
+
+    def has_add_permission(self, request):
+        return False  # Los pagos solo se crean a través de la interfaz de usuario

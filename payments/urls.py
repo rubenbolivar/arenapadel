@@ -1,14 +1,14 @@
 from django.urls import path
 from . import views
 
+app_name = 'payments'
+
 urlpatterns = [
     path('reservation/<int:reservation_id>/payment/', 
          views.payment_method_selection, 
          name='payment_select'),
     
-    path('reservation/<int:reservation_id>/create/',
-         views.create_stripe_checkout_session,
-         name='payment_create'),
+    path('create/<int:reservation_id>/', views.payment_create, name='payment_create'),
     
     path('reservation/<int:reservation_id>/confirm/',
          views.manual_payment_confirmation,
@@ -25,4 +25,7 @@ urlpatterns = [
     path('reservation/<int:reservation_id>/cancel/',
          views.payment_cancel,
          name='payment_cancel'),
+    
+    path('detail/<int:payment_id>/', views.payment_detail, name='payment_detail'),
+    path('validate/<int:payment_id>/', views.payment_validate, name='payment_validate'),
 ]

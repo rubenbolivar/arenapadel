@@ -233,3 +233,91 @@ def payment_success(request, reservation_id):
 def payment_cancel(request, reservation_id):
     reservation = get_object_or_404(Reservation, id=reservation_id, user=request.user)
     return render(request, 'payments/payment_cancel.html', {'reservation': reservation})
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.utils import timezone
+from .models import Payment
+from reservations.models import Reservation
+from django.urls import reverse
+
+@login_required
+def payment_create(request, reservation_id):
+    reservation = get_object_or_404(Reservation, id=reservation_id, user=request.user)
+    
+    if request.method == 'POST':
+        payment_method = request.POST.get('payment_method')
+        proof_image = request.FILES.get('proof_image')
+        
+        # Validar método de pago
+        if payment_method not in dict(Payment.PAYMENT_METHODS):
+            messages.error(request, 'Método de pago inválido')
+            return redirect('payment_create', reservation_id=reservation_id)
+            
+        # Para pagos en efectivo
+        if payment_method == 'CASH':
+            status = 'PENDING'
+        # Para pagos con comprobante
+        elif proof_image and payment_method in ['PAGO_MOVIL', 'ZELLE']:
+            status = 'REVIEWING'
+        else:
+            messages.error(request, 'Se requiere comprobante de pago para este método')
+            return redirect('payment_create', reservation_id=reservation_id)
+        
+        payment = Payment.objects.create(
+            reservation=reservation,
+            user=request.user,
+            amount=15.00,  # Por ahora precio fijo
+            payment_method=payment_method,
+            status=status,
+            proof_image=proof_image if proof_image else None
+        )
+        
+        messages.success(request, 'Pago registrado correctamente')
+        return redirect('payment_detail', payment_id=payment.id)
+        
+    return render(request, 'payments/payment_create.html', {
+        'reservation': reservation,
+        'payment_methods': Payment.PAYMENT_METHODS
+    })
+
+@login_required
+def payment_detail(request, payment_id):
+    payment = get_object_or_404(Payment, id=payment_id, user=request.user)
+    return render(request, 'payments/payment_detail.html', {'payment': payment})
+
+# Vista para administradores
+@login_required
+def payment_validate(request, payment_id):
+    if not request.user.is_staff:
+        messages.error(request, 'No tienes permisos para validar pagos')
+        return redirect('home')
+        
+    payment = get_object_or_404(Payment, id=payment_id)
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'approve':
+            payment.status = 'APPROVED'
+            payment.validated_by = request.user
+            payment.validated_at = timezone.now()
+            payment.save()
+            
+            # Actualizar estado de la reserva
+            payment.reservation.status = 'confirmed'
+            payment.reservation.save()
+            
+            messages.success(request, 'Pago aprobado correctamente')
+            
+        elif action == 'reject':
+            payment.status = 'REJECTED'
+            payment.validated_by = request.user
+            payment.validated_at = timezone.now()
+            payment.notes = request.POST.get('rejection_reason', '')
+            payment.save()
+            
+            messages.success(request, 'Pago rechazado')
+            
+    return redirect('admin:payments_payment_change', payment.id)

@@ -4,27 +4,26 @@ from django.utils.translation import gettext_lazy as _
 from reservations.models import Reservation
 
 class Payment(models.Model):
-    PAYMENT_METHOD_CHOICES = [
-        ('pago_movil', _('Pago Móvil')),
-        ('zelle', 'Zelle'),
-        ('bank_transfer', _('Bank Transfer')),
-        ('stripe', 'Stripe'),
-        ('paypal', 'PayPal'),
-        ('cash', _('Cash')),
+    PAYMENT_METHODS = [
+        ('PAGO_MOVIL', _('Pago Móvil')),
+        ('ZELLE', _('Zelle')),
+        ('CASH', _('Efectivo')),
+        ('STRIPE', _('Stripe')),
+        ('PAYPAL', _('PayPal')),
+    ]
+
+    PAYMENT_STATUS = [
+        ('PENDING', _('Pendiente')),
+        ('REVIEWING', _('En Revisión')),
+        ('APPROVED', _('Aprobado')),
+        ('REJECTED', _('Rechazado')),
+        ('CANCELLED', _('Cancelado')),
     ]
     
-    STATUS_CHOICES = [
-        ('pending', _('Pending')),
-        ('processing', _('Processing')),
-        ('completed', _('Completed')),
-        ('failed', _('Failed')),
-        ('refunded', _('Refunded')),
-    ]
-    
-    reservation = models.ForeignKey(
+    reservation = models.OneToOneField(
         Reservation,
         on_delete=models.CASCADE,
-        related_name='payments',
+        related_name='payment',
         verbose_name=_('reservation')
     )
     user = models.ForeignKey(
@@ -37,41 +36,36 @@ class Payment(models.Model):
     payment_method = models.CharField(
         _('payment method'),
         max_length=20,
-        choices=PAYMENT_METHOD_CHOICES
+        choices=PAYMENT_METHODS
     )
     status = models.CharField(
         _('status'),
         max_length=20,
-        choices=STATUS_CHOICES,
-        default='pending'
+        choices=PAYMENT_STATUS,
+        default='PENDING'
     )
-    transaction_id = models.CharField(
-        _('transaction ID'),
-        max_length=255,
-        blank=True,
-        null=True
-    )
-    proof_of_payment = models.ImageField(
+    proof_image = models.ImageField(
         _('proof of payment'),
         upload_to='payment_proofs/',
-        blank=True,
-        null=True
+        null=True,
+        blank=True
     )
+    notes = models.TextField(_('notes'), blank=True)
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
-    notes = models.TextField(_('notes'), blank=True)
-    
+    validated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='validated_payments'
+    )
+    validated_at = models.DateTimeField(_('validated at'), null=True, blank=True)
+
     class Meta:
         verbose_name = _('payment')
         verbose_name_plural = _('payments')
         ordering = ['-created_at']
     
     def __str__(self):
-        return f"{self.get_payment_method_display()} - {self.amount} USD - {self.reservation}"
-    
-    def save(self, *args, **kwargs):
-        # If payment is completed, update reservation status
-        if self.status == 'completed' and self.reservation.status == 'pending':
-            self.reservation.status = 'confirmed'
-            self.reservation.save()
-        super().save(*args, **kwargs)
+        return f"Payment {self.id} - {self.get_payment_method_display()} - {self.get_status_display()}"
