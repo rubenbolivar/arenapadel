@@ -1,15 +1,17 @@
-from django.urls import path
+from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from . import views
+from reservations.views import court_reserve_view, reservation_confirm_view
 
 urlpatterns = [
     path('', views.home, name='home'),
     path('courts/', views.court_list, name='court_list'),
     path('courts/<int:court_id>/', views.court_detail, name='court_detail'),
-    path('courts/<int:court_id>/reserve/', views.create_reservation, name='create_reservation'),
-    path('reservations/<int:reservation_id>/cancel/', views.cancel_reservation, name='cancel_reservation'),
+    path('courts/<int:court_id>/reserve/', court_reserve_view, name='reservation_create'),
+    path('reservations/<int:reservation_id>/confirm/', reservation_confirm_view, name='reservation_confirm'),
+    path('reservations/<int:reservation_id>/cancel/', views.cancel_reservation, name='reservation_cancel'),
     path('profile/', views.profile, name='profile'),
-    path('profile/update/', views.profile_update, name='profile_update'),
+    path('profile/update/', views.profile_update, name='profile_edit'),
     path('login/', views.login_view, name='login'),
     path('register/', views.register, name='register'),
     path('logout/', views.logout_view, name='logout'),

@@ -45,7 +45,7 @@
                     <!-- Payment Methods -->
                     <div class="mb-4">
                         <h2 class="h5 mb-3">Método de Pago</h2>
-                        <form id="payment-form" method="post" action="{% url 'payments:payment_create' reservation.id %}" class="needs-validation" novalidate>
+                        <form id="payment-form" method="post" action="{% url 'payment_create' reservation.id %}" class="needs-validation" novalidate>
                             {% csrf_token %}
                             <input type="hidden" id="id_payment_method" name="payment_method" value="">
 

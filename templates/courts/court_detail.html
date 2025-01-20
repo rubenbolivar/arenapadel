@@ -23,7 +23,7 @@
                 </div>
                 {% if selected_date and selected_hour and is_available %}
                 <div>
-                    <form method="post" action="{% url 'create_reservation' court.id %}">
+                    <form method="post" action="{% url 'reservation_create' court.id %}">
                         {% csrf_token %}
                         <input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">
                         <input type="hidden" name="time" value="{{ selected_hour }}">
