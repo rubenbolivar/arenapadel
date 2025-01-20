@@ -36,12 +36,12 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('', include('arenapadel.web_urls')),  # Rutas web sin namespace
+    path('', include('arenapadel.web_urls')),  # Web routes
     path('admin/', admin.site.urls),
     path('api/users/', include('users.urls')),
     path('api/reservations/', include('reservations.urls')),
     path('api/payments/', include('payments.urls')),
-    path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='api_docs_swagger'),
+    path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='api_docs'),
     path('api/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='api_docs_redoc'),
 ]
 

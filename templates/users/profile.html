@@ -90,7 +90,7 @@
                                                 <td>${{ reservation.court.hourly_rate }}</td>
                                                 <td>
                                                     {% if reservation.status == 'pending' %}
-                                                    <a href="{% url 'reservations:reservation_confirm' reservation.id %}" 
+                                                    <a href="{% url 'reservation_confirm' reservation.id %}" 
                                                        class="btn btn-sm btn-primary">
                                                         <i class="bi bi-check-circle me-1"></i>Confirmar
                                                     </a>
