@@ -16,34 +16,47 @@ def court_reserve_view(request, court_id):
     if request.method == 'POST':
         date = request.POST.get('date')
         time = request.POST.get('time')
-        duration = float(request.POST.get('duration', 1))
         
         if date and time:
             try:
-                # Combine date and time
-                start_time = timezone.datetime.strptime(f"{date} {time}", '%Y-%m-%d %H:%M')
-                end_time = start_time + timezone.timedelta(hours=duration)
+                # Parse date and time
+                selected_date = timezone.datetime.strptime(date, '%Y-%m-%d').date()
+                selected_hour = int(time)
                 
-                # Create reservation
-                reservation = Reservation.objects.create(
-                    user=request.user,
-                    court=court,
-                    start_time=start_time,
-                    end_time=end_time,
-                    status='pending'
+                # Create datetime objects for the reservation
+                start_datetime = timezone.make_aware(
+                    timezone.datetime.combine(selected_date, timezone.datetime.min.time().replace(hour=selected_hour))
                 )
+                end_datetime = start_datetime + timezone.timedelta(hours=1)
                 
-                return redirect('reservations:reservation_confirm', reservation_id=reservation.id)
+                # Check if the court is available
+                if not Reservation.objects.filter(
+                    court=court,
+                    status='confirmed',
+                    start_time__lt=end_datetime,
+                    end_time__gt=start_datetime
+                ).exists():
+                    # Calculate total price (1 hour at court's rate)
+                    total_price = court.hourly_rate
+                    
+                    # Create the reservation
+                    reservation = Reservation.objects.create(
+                        user=request.user,
+                        court=court,
+                        start_time=start_datetime,
+                        end_time=end_datetime,
+                        total_price=total_price,
+                        status='confirmed'
+                    )
+                    
+                    messages.success(request, '¡Reserva creada exitosamente!')
+                    return redirect('profile')
+                else:
+                    messages.error(request, 'Lo sentimos, esta cancha ya no está disponible para el horario seleccionado.')
             except ValueError:
-                messages.error(request, 'Fecha u hora inválida')
-                return redirect('court_detail', court_id=court_id)
+                messages.error(request, 'Por favor, selecciona una fecha y hora válidas.')
     
-    context = {
-        'court': court,
-        'min_date': timezone.now().date(),
-        'max_date': (timezone.now() + timezone.timedelta(days=30)).date(),
-    }
-    return render(request, 'reservations/court_reserve.html', context)
+    return redirect('court_detail', court_id=court_id)
 
 @login_required
 def reservation_confirm_view(request, reservation_id):
