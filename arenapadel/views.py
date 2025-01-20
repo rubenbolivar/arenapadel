@@ -63,11 +63,59 @@ def court_detail(request, court_id):
     # Generate available hours (7:00 AM - 11:00 PM)
     available_hours = list(range(7, 23))
     
-    # Generate next 7 days for the calendar
+    # Generate next 7 days for the calendar display
     today = timezone.now().date()
     next_week_dates = [today + timedelta(days=i) for i in range(7)]
     
-    # Create a dictionary to store availability for each date and hour
+    # Initialize context
+    context = {
+        'court': court,
+        'available_hours': available_hours,
+        'today': today,
+        'next_week_dates': next_week_dates,
+        'selected_date': None,
+        'selected_hour': None,
+        'is_available': False,
+    }
+    
+    # If date and time are provided, check specific availability
+    if date_str and time_str:
+        try:
+            # Parse date and time
+            selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            selected_hour = int(time_str)
+            
+            # Create datetime objects for the selected time slot
+            selected_datetime = timezone.make_aware(
+                datetime.combine(selected_date, datetime.min.time().replace(hour=selected_hour))
+            )
+            end_datetime = selected_datetime + timedelta(hours=1)
+            
+            # Check if the selected date is in the past
+            if selected_date < today:
+                is_available = False
+                messages.error(request, 'No se pueden hacer reservas en fechas pasadas.')
+            else:
+                # Check if there are any confirmed reservations for this time slot
+                is_available = not Reservation.objects.filter(
+                    court=court,
+                    status='confirmed',
+                    start_time__lt=end_datetime,
+                    end_time__gt=selected_datetime
+                ).exists()
+            
+            context.update({
+                'selected_date': selected_date,
+                'selected_hour': selected_hour,
+                'is_available': is_available,
+                'selected_datetime': selected_datetime,
+                'end_datetime': end_datetime,
+            })
+            
+        except (ValueError, TypeError):
+            messages.error(request, 'Por favor, selecciona una fecha y hora válidas.')
+    
+    # Create a dictionary to store availability for displayed dates
     availability = {}
     for date in next_week_dates:
         availability[date] = {}
@@ -88,44 +136,7 @@ def court_detail(request, court_id):
             
             availability[date][hour] = is_slot_available
     
-    # Initialize context
-    context = {
-        'court': court,
-        'available_hours': available_hours,
-        'today': today,
-        'next_week_dates': next_week_dates,
-        'availability': availability,
-        'selected_date': None,
-        'selected_hour': None,
-        'is_available': False,
-    }
-    
-    # If date and time are provided, check specific availability
-    if date_str and time_str:
-        try:
-            # Parse date and time
-            selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-            selected_hour = int(time_str)
-            
-            # Create datetime objects for the selected time slot
-            selected_datetime = timezone.make_aware(
-                datetime.combine(selected_date, datetime.min.time().replace(hour=selected_hour))
-            )
-            end_datetime = selected_datetime + timedelta(hours=1)
-            
-            # Get availability from our pre-calculated dictionary
-            is_available = availability[selected_date][selected_hour]
-            
-            context.update({
-                'selected_date': selected_date,
-                'selected_hour': selected_hour,
-                'is_available': is_available,
-                'selected_datetime': selected_datetime,
-                'end_datetime': end_datetime,
-            })
-            
-        except (ValueError, TypeError):
-            messages.error(request, 'Por favor, selecciona una fecha y hora válidas.')
+    context['availability'] = availability
     
     return render(request, 'courts/court_detail.html', context)
 

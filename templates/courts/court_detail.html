@@ -22,7 +22,7 @@
                     <h1 class="fw-bold mb-2">{{ court.name }}</h1>
                     <p class="lead mb-0">Cancha #{{ court.number }} - ${{ court.hourly_rate }}/hora</p>
                 </div>
-                {% if selected_date and selected_hour and is_available %}
+                {% if selected_date and selected_hour and is_available and selected_date >= today %}
                 <div>
                     <form method="post" action="{% url 'reservation_create' court.id %}">
                         {% csrf_token %}
@@ -81,7 +81,9 @@
                     {% if selected_date and selected_hour %}
                     <div class="alert {% if is_available %}alert-success{% else %}alert-danger{% endif %}">
                         <h3 class="h5 mb-2">
-                            {% if is_available %}
+                            {% if selected_date < today %}
+                            <i class="bi bi-x-circle me-2"></i>No se pueden hacer reservas en fechas pasadas
+                            {% elif is_available %}
                             <i class="bi bi-check-circle me-2"></i>Horario Disponible
                             {% else %}
                             <i class="bi bi-x-circle me-2"></i>Horario No Disponible
