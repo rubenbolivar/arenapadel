@@ -78,26 +78,14 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.querySelector('form');
-        const dateInput = document.getElementById('date');
-        const timeInput = document.getElementById('time');
         
+        // Validate form before submit
         form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            // Combine date and time
-            const date = dateInput.value;
-            const time = timeInput.value;
-            const startTime = date + ' ' + time;
-            
-            // Create hidden input for start_time
-            const startTimeInput = document.createElement('input');
-            startTimeInput.type = 'hidden';
-            startTimeInput.name = 'start_time';
-            startTimeInput.value = startTime;
-            form.appendChild(startTimeInput);
-            
-            // Submit form
-            form.submit();
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
         });
     });
 </script>
