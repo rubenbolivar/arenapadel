@@ -64,7 +64,7 @@ WSGI_APPLICATION = 'arenapadel.wsgi.application'
 # Database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql'),
         'NAME': os.getenv('DB_NAME', 'arenapadel'),
         'USER': os.getenv('DB_USER', 'arenapadel'),
         'PASSWORD': os.getenv('DB_PASSWORD', ''),
