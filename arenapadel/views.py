@@ -8,7 +8,8 @@ from reservations.models import Court, Reservation
 from datetime import datetime, timedelta
 
 def home(request):
-    return render(request, 'home.html')
+    latest_courts = Court.objects.filter(is_active=True)[:3]
+    return render(request, 'home.html', {'latest_courts': latest_courts})
 
 def court_list(request):
     # Get all active courts
