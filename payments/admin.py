@@ -2,11 +2,13 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
 from .models import Payment
+from .forms import PaymentForm, PaymentValidationForm
 
 # Register your models here.
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
+    form = PaymentForm
     list_display = ['id', 'user', 'reservation', 'amount', 'payment_method', 'status', 'view_proof_image', 'created_at']
     list_filter = ['payment_method', 'status', 'created_at']
     search_fields = ['user__username', 'user__email', 'reservation__court__name']
@@ -15,17 +17,15 @@ class PaymentAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
     
     fieldsets = (
-        ('Información Básica', {
-            'fields': ('reservation', 'user', 'amount', 'payment_method', 'status')
+        (None, {
+            'fields': ('user', 'reservation', 'amount')
         }),
-        (_('Comprobante'), {
-            'fields': ('proof_image', 'notes')
+        (_('Payment Details'), {
+            'fields': ('payment_method', 'status', 'proof_image')
         }),
-        (_('Validación'), {
-            'fields': ('validated_by', 'validated_at')
-        }),
-        (_('Fechas'), {
-            'fields': ('created_at', 'updated_at')
+        (_('Timestamps'), {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
         }),
     )
     
@@ -37,8 +37,10 @@ class PaymentAdmin(admin.ModelAdmin):
     
     def get_readonly_fields(self, request, obj=None):
         if obj:  # editing an existing object
-            return ('reservation', 'user', 'amount', 'created_at', 'updated_at')
-        return ()
-
-    def has_add_permission(self, request):
-        return False  # Los pagos solo se crean a través de la interfaz de usuario
+            return self.readonly_fields + ('user', 'reservation', 'amount', 'payment_method')
+        return self.readonly_fields
+    
+    def get_form(self, request, obj=None, **kwargs):
+        if obj and obj.status in ['pending', 'in_review']:
+            kwargs['form'] = PaymentValidationForm
+        return super().get_form(request, obj, **kwargs)
