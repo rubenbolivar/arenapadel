@@ -9,7 +9,7 @@ from .forms import PaymentForm, PaymentValidationForm
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
     form = PaymentForm
-    list_display = ['id', 'user', 'reservation', 'amount', 'payment_method', 'status', 'view_proof_image', 'created_at']
+    list_display = ['id', 'user', 'reservation', 'amount', 'payment_method', 'status', 'view_proof_of_payment', 'created_at']
     list_filter = ['payment_method', 'status', 'created_at']
     search_fields = ['user__username', 'user__email', 'reservation__court__name']
     readonly_fields = ['created_at', 'updated_at']
@@ -21,7 +21,7 @@ class PaymentAdmin(admin.ModelAdmin):
             'fields': ('user', 'reservation', 'amount')
         }),
         (_('Payment Details'), {
-            'fields': ('payment_method', 'status', 'proof_image')
+            'fields': ('payment_method', 'status', 'proof_of_payment')
         }),
         (_('Timestamps'), {
             'fields': ('created_at', 'updated_at'),
@@ -29,11 +29,11 @@ class PaymentAdmin(admin.ModelAdmin):
         }),
     )
     
-    def view_proof_image(self, obj):
-        if obj.proof_image:
-            return format_html('<a href="{}" target="_blank">View Proof</a>', obj.proof_image.url)
+    def view_proof_of_payment(self, obj):
+        if obj.proof_of_payment:
+            return format_html('<a href="{}" target="_blank">View Proof</a>', obj.proof_of_payment.url)
         return "-"
-    view_proof_image.short_description = _('Proof of Payment')
+    view_proof_of_payment.short_description = _('Proof of Payment')
     
     def get_readonly_fields(self, request, obj=None):
         if obj:  # editing an existing object

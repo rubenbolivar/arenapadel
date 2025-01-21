@@ -44,7 +44,7 @@ class Payment(models.Model):
         choices=PAYMENT_STATUS,
         default='PENDING'
     )
-    proof_image = models.ImageField(
+    proof_of_payment = models.ImageField(
         _('proof of payment'),
         upload_to='payment_proofs/',
         null=True,
