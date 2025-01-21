@@ -19,7 +19,7 @@ class PaymentAdmin(admin.ModelAdmin):
             'fields': ('reservation', 'user', 'amount', 'payment_method', 'status')
         }),
         (_('Comprobante'), {
-            'fields': ('proof_of_payment', 'notes')
+            'fields': ('proof_image', 'notes')
         }),
         (_('Validación'), {
             'fields': ('validated_by', 'validated_at')
@@ -30,8 +30,8 @@ class PaymentAdmin(admin.ModelAdmin):
     )
     
     def view_proof_of_payment(self, obj):
-        if obj.proof_of_payment:
-            return format_html('<a href="{}" target="_blank">View Proof</a>', obj.proof_of_payment.url)
+        if obj.proof_image:
+            return format_html('<a href="{}" target="_blank">View Proof</a>', obj.proof_image.url)
         return "-"
     view_proof_of_payment.short_description = _('Proof of Payment')
     
