@@ -143,7 +143,7 @@ def manual_payment_confirmation(request, reservation_id):
     
     if request.method == 'POST':
         payment_method = request.POST.get('payment_method')
-        proof_of_payment = request.FILES.get('proof_of_payment')
+        proof_image = request.FILES.get('proof_image')
         
         payment = Payment.objects.create(
             reservation=reservation,
@@ -151,7 +151,7 @@ def manual_payment_confirmation(request, reservation_id):
             amount=reservation.total_price,
             payment_method=payment_method,
             status='pending',
-            proof_of_payment=proof_of_payment
+            proof_image=proof_image
         )
         
         # Send email notification to admin
@@ -248,7 +248,7 @@ def payment_create(request, reservation_id):
     
     if request.method == 'POST':
         payment_method = request.POST.get('payment_method')
-        proof_of_payment = request.FILES.get('proof_of_payment')
+        proof_image = request.FILES.get('proof_image')
         
         # Validar método de pago
         if payment_method not in dict(Payment.PAYMENT_METHODS):
@@ -259,7 +259,7 @@ def payment_create(request, reservation_id):
         if payment_method == 'CASH':
             status = 'PENDING'
         # Para pagos con comprobante
-        elif proof_of_payment and payment_method in ['PAGO_MOVIL', 'ZELLE']:
+        elif proof_image and payment_method in ['PAGO_MOVIL', 'ZELLE']:
             status = 'REVIEWING'
         else:
             messages.error(request, 'Se requiere comprobante de pago para este método')
@@ -271,7 +271,7 @@ def payment_create(request, reservation_id):
             amount=15.00,  # Por ahora precio fijo
             payment_method=payment_method,
             status=status,
-            proof_of_payment=proof_of_payment if proof_of_payment else None
+            proof_image=proof_image if proof_image else None
         )
         
         messages.success(request, 'Pago registrado correctamente')
