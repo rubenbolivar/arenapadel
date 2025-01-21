@@ -143,7 +143,7 @@ def manual_payment_confirmation(request, reservation_id):
     
     if request.method == 'POST':
         payment_method = request.POST.get('payment_method')
-        proof_of_payment = request.FILES.get('proof_of_payment')
+        proof_image = request.FILES.get('proof_image')
         
         payment = Payment.objects.create(
             reservation=reservation,
@@ -151,7 +151,7 @@ def manual_payment_confirmation(request, reservation_id):
             amount=reservation.total_price,
             payment_method=payment_method,
             status='pending',
-            proof_of_payment=proof_of_payment
+            proof_image=proof_image
         )
         
         # Send email notification to admin
