@@ -46,11 +46,11 @@
         </div>
     </div>
 
-    {% if payment.proof_image %}
+    {% if payment.proof_of_payment %}
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">Comprobante de Pago</h5>
-            <img src="{{ payment.proof_image.url }}" alt="Comprobante de pago" class="img-fluid">
+            <img src="{{ payment.proof_of_payment.url }}" alt="Comprobante de pago" class="img-fluid">
         </div>
     </div>
     {% endif %}
