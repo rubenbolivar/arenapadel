@@ -18,11 +18,11 @@ class Court(models.Model):
         ordering = ['number']
     
     def __str__(self):
-        return f"Arena {self.number}"
+        return self.name
 
 class Reservation(models.Model):
     STATUS_CHOICES = [
-        ('pending', _('Pending')),
+        ('pending_payment', _('Pending Payment')),
         ('confirmed', _('Confirmed')),
         ('cancelled', _('Cancelled')),
         ('completed', _('Completed')),
@@ -46,11 +46,10 @@ class Reservation(models.Model):
         _('status'),
         max_length=20,
         choices=STATUS_CHOICES,
-        default='pending'
+        default='pending_payment'
     )
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
-    total_price = models.DecimalField(_('total price'), max_digits=10, decimal_places=2)
     
     class Meta:
         verbose_name = _('reservation')
@@ -58,7 +57,7 @@ class Reservation(models.Model):
         ordering = ['-start_time']
         
     def __str__(self):
-        return f"{self.court} - {self.user.get_full_name()} - {self.start_time.strftime('%Y-%m-%d %H:%M')}"
+        return f"{self.court.name} - {self.start_time.strftime('%Y-%m-%d %H:%M')}"
     
     def clean(self):
         if self.start_time and self.end_time:
@@ -77,20 +76,19 @@ class Reservation(models.Model):
             # Check for overlapping reservations
             overlapping = Reservation.objects.filter(
                 court=self.court,
-                status='confirmed',
+                status__in=['confirmed', 'pending_payment'],
                 start_time__lt=self.end_time,
                 end_time__gt=self.start_time
             ).exclude(pk=self.pk)
             
             if overlapping.exists():
-                raise ValidationError(_('This court is already reserved for this time period'))
+                raise ValidationError(_('This time slot is already reserved'))
     
+    @property
+    def total_price(self):
+        duration = (self.end_time - self.start_time).seconds / 3600
+        return self.court.hourly_rate * duration
+
     def save(self, *args, **kwargs):
-        if not self.total_price:
-            # Calculate hours (rounded up to the nearest hour)
-            duration = self.end_time - self.start_time
-            hours = (duration.seconds + 3599) // 3600  # Round up
-            self.total_price = self.court.hourly_rate * hours
-        
         self.clean()
         super().save(*args, **kwargs)

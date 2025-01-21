@@ -23,7 +23,7 @@ class Payment(models.Model):
     reservation = models.OneToOneField(
         Reservation,
         on_delete=models.CASCADE,
-        related_name='payment',
+        related_name='payment_set',
         verbose_name=_('reservation')
     )
     user = models.ForeignKey(

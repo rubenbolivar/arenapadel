@@ -253,34 +253,42 @@ def payment_create(request, reservation_id):
         # Validar método de pago
         if payment_method not in dict(Payment.PAYMENT_METHODS):
             messages.error(request, 'Método de pago inválido')
-            return redirect('payment_create', reservation_id=reservation_id)
-            
-        # Para pagos en efectivo
-        if payment_method == 'CASH':
-            status = 'PENDING'
-        # Para pagos con comprobante
-        elif proof_image and payment_method in ['PAGO_MOVIL', 'ZELLE']:
-            status = 'REVIEWING'
-        else:
-            messages.error(request, 'Se requiere comprobante de pago para este método')
-            return redirect('payment_create', reservation_id=reservation_id)
+            return redirect('reservations:reservation_confirm', reservation_id=reservation_id)
         
+        # Validar comprobante para pagos que lo requieren
+        if payment_method in ['PAGO_MOVIL', 'ZELLE'] and not proof_image:
+            messages.error(request, 'Se requiere comprobante de pago para este método')
+            return redirect('reservations:reservation_confirm', reservation_id=reservation_id)
+        
+        # Crear el pago
         payment = Payment.objects.create(
-            reservation=reservation,
             user=request.user,
-            amount=15.00,  # Por ahora precio fijo
+            reservation=reservation,
+            amount=reservation.total_price,
             payment_method=payment_method,
-            status=status,
-            proof_image=proof_image if proof_image else None
+            proof_image=proof_image if proof_image else None,
+            status='REVIEWING' if payment_method in ['PAGO_MOVIL', 'ZELLE'] else 'PENDING'
         )
         
-        messages.success(request, 'Pago registrado correctamente')
-        return redirect('payment_detail', payment_id=payment.id)
+        # Actualizar estado de la reserva
+        if payment_method == 'CASH':
+            reservation.status = 'pending_payment'
+        else:
+            reservation.status = 'confirmed' if payment_method == 'STRIPE' else 'pending_payment'
+        reservation.payment = payment
+        reservation.save()
         
-    return render(request, 'payments/payment_create.html', {
-        'reservation': reservation,
-        'payment_methods': Payment.PAYMENT_METHODS
-    })
+        # Enviar notificación por correo al admin
+        send_payment_notification_email(payment)
+        
+        # Redirigir según el método de pago
+        if payment_method == 'STRIPE':
+            return redirect('payments:stripe_checkout', payment_id=payment.id)
+        else:
+            messages.success(request, 'Pago registrado correctamente')
+            return redirect('users:profile')
+    
+    return redirect('reservations:reservation_confirm', reservation_id=reservation_id)
 
 @login_required
 def payment_detail(request, payment_id):

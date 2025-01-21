@@ -45,34 +45,34 @@
                     <!-- Payment Methods -->
                     <div class="mb-4">
                         <h2 class="h5 mb-3">Método de Pago</h2>
-                        <form id="payment-form" method="post" action="{% url 'payment_create' reservation.id %}" class="needs-validation" novalidate>
+                        <form id="payment-form" method="post" action="{% url 'payment_create' reservation.id %}" class="needs-validation" novalidate enctype="multipart/form-data">
                             {% csrf_token %}
                             <input type="hidden" id="id_payment_method" name="payment_method" value="">
 
                             <div class="row g-3">
-                                <!-- Credit Card -->
+                                <!-- Pago Móvil -->
                                 <div class="col-md-4">
-                                    <div class="card payment-method h-100" data-method="stripe">
+                                    <div class="card payment-method h-100" data-method="PAGO_MOVIL">
                                         <div class="card-body text-center py-4">
-                                            <i class="fas fa-credit-card fa-2x mb-3 text-primary"></i>
-                                            <h3 class="h6 mb-0">Tarjeta de Crédito</h3>
+                                            <i class="fas fa-mobile-alt fa-2x mb-3 text-primary"></i>
+                                            <h3 class="h6 mb-0">Pago Móvil</h3>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Bank Transfer -->
+                                <!-- Zelle -->
                                 <div class="col-md-4">
-                                    <div class="card payment-method h-100" data-method="transfer">
+                                    <div class="card payment-method h-100" data-method="ZELLE">
                                         <div class="card-body text-center py-4">
                                             <i class="fas fa-university fa-2x mb-3 text-primary"></i>
-                                            <h3 class="h6 mb-0">Transferencia Bancaria</h3>
+                                            <h3 class="h6 mb-0">Zelle</h3>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Cash -->
                                 <div class="col-md-4">
-                                    <div class="card payment-method h-100" data-method="cash">
+                                    <div class="card payment-method h-100" data-method="CASH">
                                         <div class="card-body text-center py-4">
                                             <i class="fas fa-money-bill fa-2x mb-3 text-primary"></i>
                                             <h3 class="h6 mb-0">Efectivo</h3>
@@ -81,13 +81,56 @@
                                 </div>
                             </div>
 
+                            <!-- Payment Instructions -->
+                            <div id="payment-instructions" class="mt-4" style="display: none;">
+                                <!-- Pago Móvil Instructions -->
+                                <div id="PAGO_MOVIL-instructions" class="payment-specific-instructions" style="display: none;">
+                                    <div class="alert alert-info">
+                                        <h4 class="h6">Instrucciones para Pago Móvil</h4>
+                                        <p class="mb-2">Por favor realiza el pago a:</p>
+                                        <ul class="list-unstyled">
+                                            <li><strong>Banco:</strong> Banesco</li>
+                                            <li><strong>Teléfono:</strong> 0414-1234567</li>
+                                            <li><strong>CI:</strong> V-12345678</li>
+                                            <li><strong>Monto:</strong> ${{ total }}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!-- Zelle Instructions -->
+                                <div id="ZELLE-instructions" class="payment-specific-instructions" style="display: none;">
+                                    <div class="alert alert-info">
+                                        <h4 class="h6">Instrucciones para Zelle</h4>
+                                        <p class="mb-2">Por favor realiza el pago a:</p>
+                                        <ul class="list-unstyled">
+                                            <li><strong>Email:</strong> payment@arenaspadel.club</li>
+                                            <li><strong>Nombre:</strong> Arenas Padel Club</li>
+                                            <li><strong>Monto:</strong> ${{ total }}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!-- Cash Instructions -->
+                                <div id="CASH-instructions" class="payment-specific-instructions" style="display: none;">
+                                    <div class="alert alert-info">
+                                        <p class="mb-0">El pago en efectivo se realiza directamente en nuestras instalaciones.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Proof of Payment Upload -->
+                                <div id="proof-upload-section" class="mt-3" style="display: none;">
+                                    <div class="mb-3">
+                                        <label for="proof_image" class="form-label">Comprobante de Pago</label>
+                                        <input type="file" class="form-control" id="proof_image" name="proof_image" accept="image/*">
+                                        <div class="form-text">Por favor sube una captura de pantalla del pago realizado</div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="mt-4 text-center">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-check me-2"></i>Confirmar Reserva
+                                <button type="submit" class="btn btn-primary btn-lg px-5" disabled>
+                                    Confirmar Pago
                                 </button>
-                                <a href="{% url 'users:profile' %}" class="btn btn-outline-secondary btn-lg ms-2">
-                                    <i class="fas fa-times me-2"></i>Cancelar
-                                </a>
                             </div>
                         </form>
                     </div>
@@ -96,30 +139,55 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
 {% block extra_js %}
-<script src="https://js.stripe.com/v3/"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const paymentMethods = document.querySelectorAll('.payment-method');
-        const paymentMethodInput = document.getElementById('id_payment_method');
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentMethods = document.querySelectorAll('.payment-method');
+    const paymentMethodInput = document.getElementById('id_payment_method');
+    const submitButton = document.querySelector('button[type="submit"]');
+    const paymentInstructions = document.getElementById('payment-instructions');
+    const proofUploadSection = document.getElementById('proof-upload-section');
+    const proofImageInput = document.getElementById('proof_image');
 
-        paymentMethods.forEach(method => {
-            method.addEventListener('click', function() {
-                // Remove active class from all methods
-                paymentMethods.forEach(m => m.classList.remove('border-primary'));
-                // Add active class to selected method
-                this.classList.add('border-primary');
-                // Set payment method value
-                paymentMethodInput.value = this.dataset.method;
+    paymentMethods.forEach(method => {
+        method.addEventListener('click', function() {
+            // Remove active class from all methods
+            paymentMethods.forEach(m => m.classList.remove('border-primary'));
+            
+            // Add active class to selected method
+            this.classList.add('border-primary');
+            
+            // Get selected payment method
+            const selectedMethod = this.dataset.method;
+            paymentMethodInput.value = selectedMethod;
+            
+            // Show/hide payment instructions
+            paymentInstructions.style.display = 'block';
+            document.querySelectorAll('.payment-specific-instructions').forEach(inst => {
+                inst.style.display = 'none';
             });
+            document.getElementById(`${selectedMethod}-instructions`).style.display = 'block';
+            
+            // Show/hide proof upload section based on payment method
+            if (selectedMethod === 'PAGO_MOVIL' || selectedMethod === 'ZELLE') {
+                proofUploadSection.style.display = 'block';
+                proofImageInput.required = true;
+                submitButton.disabled = !proofImageInput.files.length;
+            } else {
+                proofUploadSection.style.display = 'none';
+                proofImageInput.required = false;
+                submitButton.disabled = false;
+            }
         });
+    });
 
-        // Select first payment method by default
-        if (paymentMethods.length > 0) {
-            paymentMethods[0].click();
+    // Enable/disable submit button based on proof upload for relevant payment methods
+    proofImageInput.addEventListener('change', function() {
+        if (paymentMethodInput.value === 'PAGO_MOVIL' || paymentMethodInput.value === 'ZELLE') {
+            submitButton.disabled = !this.files.length;
         }
     });
+});
 </script>
 {% endblock %}
