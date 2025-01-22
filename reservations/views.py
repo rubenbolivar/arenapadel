@@ -32,25 +32,21 @@ def court_reserve_view(request, court_id):
                 # Check if the court is available
                 if not Reservation.objects.filter(
                     court=court,
-                    status='confirmed',
+                    status__in=['confirmed', 'pending_payment'],
                     start_time__lt=end_datetime,
                     end_time__gt=start_datetime
                 ).exists():
-                    # Calculate total price (1 hour at court's rate)
-                    total_price = court.hourly_rate
-                    
-                    # Create the reservation
+                    # Create the reservation with pending_payment status
                     reservation = Reservation.objects.create(
                         user=request.user,
                         court=court,
                         start_time=start_datetime,
                         end_time=end_datetime,
-                        total_price=total_price,
-                        status='confirmed'
+                        status='pending_payment'  # Changed from 'confirmed' to 'pending_payment'
                     )
                     
-                    messages.success(request, '¡Reserva creada exitosamente!')
-                    return redirect('profile')
+                    # Redirect to payment method selection
+                    return redirect('payments:payment_select', reservation_id=reservation.id)
                 else:
                     messages.error(request, 'Lo sentimos, esta cancha ya no está disponible para el horario seleccionado.')
             except ValueError:
@@ -61,13 +57,10 @@ def court_reserve_view(request, court_id):
 @login_required
 def reservation_confirm_view(request, reservation_id):
     reservation = get_object_or_404(Reservation, id=reservation_id, user=request.user)
-    duration = (reservation.end_time - reservation.start_time).seconds / 3600
-    total = reservation.court.hourly_rate * duration
     
     context = {
         'reservation': reservation,
-        'duration': duration,
-        'total': total
+        'total': reservation.total_price
     }
     return render(request, 'reservations/reservation_confirm.html', context)
 
@@ -102,7 +95,7 @@ class CourtAvailabilityView(APIView):
         reservations = Reservation.objects.filter(
             court=court,
             start_time__date=date,
-            status__in=['confirmed', 'pending']
+            status__in=['confirmed', 'pending_payment']  # Added pending_payment to status check
         )
         
         # Create a list of all hours in a day
@@ -137,7 +130,7 @@ class CourtScheduleView(APIView):
         reservations = Reservation.objects.filter(
             court=court,
             start_time__date__range=[start_date, end_date],
-            status__in=['confirmed', 'pending']
+            status__in=['confirmed', 'pending_payment']  # Added pending_payment to status check
         )
         
         # Create schedule data

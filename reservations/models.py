@@ -3,6 +3,7 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from decimal import Decimal
 
 # Create your models here.
 
@@ -86,7 +87,7 @@ class Reservation(models.Model):
     
     @property
     def total_price(self):
-        duration = (self.end_time - self.start_time).seconds / 3600
+        duration = Decimal(str((self.end_time - self.start_time).total_seconds())) / Decimal('3600')
         return self.court.hourly_rate * duration
 
     def save(self, *args, **kwargs):

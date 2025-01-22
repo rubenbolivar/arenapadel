@@ -180,14 +180,14 @@ def create_reservation(request, court_id):
                 )
                 
                 messages.success(request, '¡Reserva creada exitosamente!')
-                return redirect('web:web_profile')
+                return redirect('profile')
             else:
                 messages.error(request, 'Lo sentimos, esta cancha ya no está disponible para el horario seleccionado.')
                 
         except (ValueError, TypeError):
             messages.error(request, 'Por favor, selecciona una fecha y hora válidas.')
     
-    return redirect('web:web_court_detail', court_id=court_id)
+    return redirect('court_detail', court_id=court_id)
 
 @login_required
 def cancel_reservation(request, reservation_id):
@@ -202,7 +202,7 @@ def cancel_reservation(request, reservation_id):
         else:
             messages.error(request, 'No se puede cancelar una reserva pasada.')
     
-    return redirect('web:web_profile')
+    return redirect('profile')
 
 @login_required
 def profile(request):
@@ -225,8 +225,8 @@ def profile_update(request):
         user.email = request.POST.get('email', '')
         user.save()
         messages.success(request, 'Perfil actualizado exitosamente.')
-        return redirect('web:web_profile')
-    return redirect('web:web_profile')
+        return redirect('profile')
+    return redirect('profile')
 
 def login_view(request):
     if request.method == 'POST':
@@ -235,7 +235,7 @@ def login_view(request):
             user = form.get_user()
             login(request, user)
             messages.success(request, '¡Bienvenido de nuevo!')
-            return redirect('web:web_home')
+            return redirect('home')
     else:
         form = UserLoginForm()
     return render(request, 'users/login.html', {'form': form})
@@ -247,7 +247,7 @@ def register(request):
             user = form.save()
             login(request, user)
             messages.success(request, '¡Cuenta creada exitosamente!')
-            return redirect('web:web_home')
+            return redirect('home')
     else:
         form = UserRegistrationForm()
     return render(request, 'users/register.html', {'form': form})
@@ -255,7 +255,7 @@ def register(request):
 def logout_view(request):
     logout(request)
     messages.info(request, 'Has cerrado sesión correctamente.')
-    return redirect('web:web_home')
+    return redirect('home')
 
 def terms(request):
     return render(request, 'legal/terms.html')

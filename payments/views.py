@@ -1,13 +1,25 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.utils import timezone
+from django.conf import settings
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse, HttpResponse
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from rest_framework import viewsets, generics, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.conf import settings
 from .models import Payment
 from .serializers import PaymentSerializer
+from reservations.models import Reservation
+import stripe
 
-# Create your views here.
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
+# API Views
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
@@ -42,63 +54,13 @@ class PaymentMethodsView(APIView):
         ]
         return Response(payment_methods)
 
-class StripePaymentIntentView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request):
-        # Stripe payment intent logic will go here
-        return Response({'status': 'Not implemented yet'})
-
-class StripeWebhookView(APIView):
-    permission_classes = []  # No auth needed for webhooks
-
-    def post(self, request):
-        # Stripe webhook logic will go here
-        return Response({'status': 'Not implemented yet'})
-
-class ValidatePaymentView(APIView):
-    permission_classes = [permissions.IsAdminUser]
-
-    def post(self, request, payment_id):
-        try:
-            payment = Payment.objects.get(id=payment_id)
-            payment.status = 'completed'
-            payment.save()
-            return Response({'status': 'Payment validated'})
-        except Payment.DoesNotExist:
-            return Response({'error': 'Payment not found'}, status=404)
-
-class UserPaymentsView(generics.ListAPIView):
-    serializer_class = PaymentSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        return Payment.objects.filter(user=self.request.user)
-
-
-import stripe
-from django.conf import settings
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-from django.http import JsonResponse, HttpResponse
-from .models import Payment
-from reservations.models import Reservation
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-
-stripe.api_key = settings.STRIPE_SECRET_KEY
-
 @login_required
 def payment_method_selection(request, reservation_id):
     reservation = get_object_or_404(Reservation, id=reservation_id, user=request.user)
     
     context = {
         'reservation': reservation,
-        'stripe_public_key': settings.STRIPE_PUBLISHABLE_KEY,
+        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
         'zelle_email': settings.ZELLE_EMAIL,
         'pago_movil_phone': settings.PAGO_MOVIL_PHONE,
         'pago_movil_bank': settings.PAGO_MOVIL_BANK,
@@ -170,7 +132,7 @@ def manual_payment_confirmation(request, reservation_id):
         )
         
         messages.success(request, 'Tu confirmación de pago ha sido enviada. Te notificaremos cuando sea verificada.')
-        return redirect('web:web_profile')
+        return redirect('profile')
     
     return render(request, 'payments/manual_payment_confirmation.html', {
         'reservation': reservation
@@ -234,14 +196,6 @@ def payment_cancel(request, reservation_id):
     reservation = get_object_or_404(Reservation, id=reservation_id, user=request.user)
     return render(request, 'payments/payment_cancel.html', {'reservation': reservation})
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.utils import timezone
-from .models import Payment
-from reservations.models import Reservation
-from django.urls import reverse
-
 @login_required
 def payment_create(request, reservation_id):
     reservation = get_object_or_404(Reservation, id=reservation_id, user=request.user)
@@ -295,7 +249,6 @@ def payment_detail(request, payment_id):
     payment = get_object_or_404(Payment, id=payment_id, user=request.user)
     return render(request, 'payments/payment_detail.html', {'payment': payment})
 
-# Vista para administradores
 @login_required
 def payment_validate(request, payment_id):
     if not request.user.is_staff:
@@ -329,3 +282,18 @@ def payment_validate(request, payment_id):
             messages.success(request, 'Pago rechazado')
             
     return redirect('admin:payments_payment_change', payment.id)
+
+def send_payment_notification_email(payment):
+    subject = f'Nueva confirmación de pago - Reserva #{payment.reservation.id}'
+    html_message = render_to_string('payments/email/payment_confirmation.html', {
+        'payment': payment,
+        'reservation': payment.reservation,
+    })
+    send_mail(
+        subject,
+        '',
+        settings.DEFAULT_FROM_EMAIL,
+        [settings.ADMIN_EMAIL],
+        html_message=html_message,
+        fail_silently=False,
+    )
