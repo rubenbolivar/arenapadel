@@ -44,3 +44,20 @@ ENV/
 .env
 .env.local
 .env.*.local
+# Backups
+*.bak
+*.sql
+temp_*.txt
+
+# Additional logs
+logs/
+
+# Test files
+test_*.py
+
+# Additional static files
+/static/img/
+/static/css/
+
+# Settings backups
+*settings.py.bak
