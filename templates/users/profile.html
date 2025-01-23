@@ -83,9 +83,15 @@
                                                 <td>{{ reservation.start_time|date:"d/m/Y" }}</td>
                                                 <td>{{ reservation.start_time|time:"H:i" }} - {{ reservation.end_time|time:"H:i" }}</td>
                                                 <td>
-                                                    <span class="badge bg-{{ reservation.status|lower }}">
-                                                        {{ reservation.get_status_display }}
-                                                    </span>
+                                                    {% if reservation.status == 'pending_payment' %}
+                                                        <span class="badge bg-warning">Pendiente de Pago</span>
+                                                    {% elif reservation.status == 'confirmed' %}
+                                                        <span class="badge bg-success">Confirmada</span>
+                                                    {% elif reservation.status == 'cancelled' %}
+                                                        <span class="badge bg-danger">Cancelada</span>
+                                                    {% elif reservation.status == 'completed' %}
+                                                        <span class="badge bg-secondary">Completada</span>
+                                                    {% endif %}
                                                 </td>
                                                 <td>${{ reservation.court.hourly_rate }}</td>
                                                 <td>
@@ -113,7 +119,56 @@
                     <div class="card">
                         <div class="card-body">
                             <h2 class="h4 mb-4">Historial de Pagos</h2>
-                            <p class="text-muted">No hay pagos registrados.</p>
+                            {% if payments %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>Reserva</th>
+                                                <th>Método</th>
+                                                <th>Monto</th>
+                                                <th>Estado</th>
+                                                <th>Comprobante</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for payment in payments %}
+                                            <tr>
+                                                <td>{{ payment.created_at|date:"d/m/Y H:i" }}</td>
+                                                <td>{{ payment.reservation.court.name }} - {{ payment.reservation.start_time|date:"d/m/Y H:i" }}</td>
+                                                <td>{{ payment.get_payment_method_display }}</td>
+                                                <td>${{ payment.amount }}</td>
+                                                <td>
+                                                    {% if payment.status == 'PENDING' %}
+                                                        <span class="badge bg-warning">Pendiente</span>
+                                                    {% elif payment.status == 'REVIEWING' %}
+                                                        <span class="badge bg-info">En Revisión</span>
+                                                    {% elif payment.status == 'APPROVED' %}
+                                                        <span class="badge bg-success">Aprobado</span>
+                                                    {% elif payment.status == 'REJECTED' %}
+                                                        <span class="badge bg-danger">Rechazado</span>
+                                                    {% elif payment.status == 'CANCELLED' %}
+                                                        <span class="badge bg-secondary">Cancelado</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if payment.proof_image %}
+                                                        <a href="{{ payment.proof_image.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                            <i class="bi bi-eye me-1"></i>Ver
+                                                        </a>
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <p class="text-muted">No hay pagos registrados.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

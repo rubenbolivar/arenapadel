@@ -15,10 +15,12 @@ from .serializers import UserSerializer
 @login_required
 def profile_view(request):
     user = request.user
-    reservations = user.reservation_set.all().order_by('-start_time')
+    reservations = user.reservations.all().order_by('-start_time')
+    payments = user.payments.all().order_by('-created_at')
     context = {
         'user': user,
-        'reservations': reservations
+        'reservations': reservations,
+        'payments': payments
     }
     return render(request, 'users/profile.html', context)
 

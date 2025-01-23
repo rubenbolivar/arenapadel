@@ -22,13 +22,13 @@
                     <!-- Instrucciones de pago -->
                     <div class="payment-instructions mb-4">
                         <h5>Instrucciones de Pago</h5>
-                        {% if payment_method == 'zelle' %}
+                        {% if payment_method == 'ZELLE' %}
                             <p>Por favor, realiza tu pago a través de Zelle usando la siguiente información:</p>
                             <ul class="list-unstyled">
                                 <li><strong>Email:</strong> {{ zelle_email }}</li>
                                 <li><strong>Nombre:</strong> ArenaPadel Club</li>
                             </ul>
-                        {% elif payment_method == 'pago_movil' %}
+                        {% elif payment_method == 'PAGO_MOVIL' %}
                             <p>Por favor, realiza tu pago a través de Pago Móvil usando la siguiente información:</p>
                             <ul class="list-unstyled">
                                 <li><strong>Banco:</strong> {{ pago_movil_bank }}</li>
@@ -67,7 +67,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check-circle me-2"></i>Confirmar Pago
                             </button>
-                            <a href="{% url 'payment_select' reservation.id %}" class="btn btn-outline-secondary">
+                            <a href="{% url 'payments:payment_select' reservation.id %}" class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-left me-2"></i>Volver a Métodos de Pago
                             </a>
                         </div>
@@ -77,29 +77,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    // Example starter JavaScript for disabling form submissions if there are invalid fields
-    (function () {
-        'use strict'
-
-        // Fetch all the forms we want to apply custom Bootstrap validation styles to
-        var forms = document.querySelectorAll('.needs-validation')
-
-        // Loop over them and prevent submission
-        Array.prototype.slice.call(forms)
-            .forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault()
-                        event.stopPropagation()
-                    }
-
-                    form.classList.add('was-validated')
-                }, false)
-            })
-    })()
-</script>
 {% endblock %}

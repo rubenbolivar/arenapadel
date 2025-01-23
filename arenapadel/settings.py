@@ -134,6 +134,15 @@ else:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = False
     SECURE_HSTS_PRELOAD = False
 
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'arenaspadelclub.com'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'pagos@arenaspadelclub.com'
+EMAIL_HOST_PASSWORD = '1ArenasPadel$$77'
+DEFAULT_FROM_EMAIL = 'ArenaPadel Club <pagos@arenaspadelclub.com>'
+
 # Stripe settings
 STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
