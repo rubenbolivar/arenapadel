@@ -7,8 +7,8 @@ NC='\033[0m'
 
 echo -e "${GREEN}🔄 Actualizando repositorio...${NC}"
 
-# Asegurar que estamos en la rama main
-git checkout main
+# Asegurar que estamos en la rama master
+git checkout master
 
 # Agregar todos los cambios (excluyendo los que están en .gitignore)
 git add .
@@ -18,6 +18,6 @@ timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 git commit -m "🚀 Production update: $timestamp"
 
 # Push al repositorio
-git push origin main
+git push origin master
 
 echo -e "${GREEN}✅ Repositorio actualizado exitosamente${NC}"
