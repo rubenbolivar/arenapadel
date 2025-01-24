@@ -1,0 +1,55 @@
+ERROR 2025-01-20 03:47:27,429 log 118789 140032884774720 Internal Server Error: /register/
+Traceback (most recent call last):
+  File "/var/www/arenapadel/app/venv/lib/python3.8/site-packages/django/urls/base.py", line 71, in reverse
+    extra, resolver = resolver.namespace_dict[ns]
+KeyError: 'web'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/www/arenapadel/app/venv/lib/python3.8/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/var/www/arenapadel/app/venv/lib/python3.8/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/var/www/arenapadel/app/arenapadel/views.py", line 250, in register
+    return redirect('web:web_home')
+  File "/var/www/arenapadel/app/venv/lib/python3.8/site-packages/django/shortcuts.py", line 48, in redirect
+    return redirect_class(resolve_url(to, *args, **kwargs))
+  File "/var/www/arenapadel/app/venv/lib/python3.8/site-packages/django/shortcuts.py", line 145, in resolve_url
+    return reverse(to, args=args, kwargs=kwargs)
+  File "/var/www/arenapadel/app/venv/lib/python3.8/site-packages/django/urls/base.py", line 82, in reverse
+    raise NoReverseMatch("%s is not a registered namespace" % key)
+django.urls.exceptions.NoReverseMatch: 'web' is not a registered namespace
+ERROR 2025-01-20 03:48:49,754 log 118789 140032884774720 Internal Server Error: /login/
+Traceback (most recent call last):
+  File "/var/www/arenapadel/app/venv/lib/python3.8/site-packages/django/urls/base.py", line 71, in reverse
+    extra, resolver = resolver.namespace_dict[ns]
+KeyError: 'web'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/www/arenapadel/app/venv/lib/python3.8/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/var/www/arenapadel/app/venv/lib/python3.8/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/var/www/arenapadel/app/arenapadel/views.py", line 238, in login_view
+    return redirect('web:web_home')
+  File "/var/www/arenapadel/app/venv/lib/python3.8/site-packages/django/shortcuts.py", line 48, in redirect
+    return redirect_class(resolve_url(to, *args, **kwargs))
+  File "/var/www/arenapadel/app/venv/lib/python3.8/site-packages/django/shortcuts.py", line 145, in resolve_url
+    return reverse(to, args=args, kwargs=kwargs)
+  File "/var/www/arenapadel/app/venv/lib/python3.8/site-packages/django/urls/base.py", line 82, in reverse
+    raise NoReverseMatch("%s is not a registered namespace" % key)
+django.urls.exceptions.NoReverseMatch: 'web' is not a registered namespace
+ERROR 2025-01-20 13:17:31,478 exception 126512 140042311100224 Invalid HTTP_HOST header: 'api.shueur.sa'. You may need to add 'api.shueur.sa' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/var/www/arenapadel/app/venv/lib/python3.8/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/var/www/arenapadel/app/venv/lib/python3.8/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/var/www/arenapadel/app/venv/lib/python3.8/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/var/www/arenapadel/app/venv/lib/python3.8/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'api.shueur.sa'. You may need to add 'api.shueur.sa' to ALLOWED_HOSTS.
