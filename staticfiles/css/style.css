@@ -25,6 +25,10 @@
     color: var(--primary-color) !important;
 }
 
+.text-secondary {
+    color: var(--secondary-color) !important;
+}
+
 .btn-primary {
     background-color: var(--primary-color) !important;
     border-color: var(--primary-color) !important;
